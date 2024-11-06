@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+    <div class="space-x-2">
+        <a href="{% url 'projects:create' %}" 
+           class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Novo Projeto
+        </a>
+        <a href="{% url 'tasks:create' %}" 
+           class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nova Tarefa
+        </a>
+    </div>
+</div>
+
+<!-- Cards de Estatísticas -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total de Projetos</h5>
+        <div class="mt-2 text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ stats.total_projects }}</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total de Tarefas</h5>
+        <div class="mt-2 text-3xl font-bold text-blue-600 dark:text-blue-400">{{ stats.total_tasks }}</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Tarefas Concluídas</h5>
+        <div class="mt-2 text-3xl font-bold text-green-600 dark:text-green-400">{{ stats.tasks_done }}</div>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h5 class="text-sm font-medium text-gray-500 dark:text-gray-400">Tarefas Pendentes</h5>
+        <div class="mt-2 text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ stats.tasks_todo }}</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Projetos Recentes -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Projetos Recentes</h5>
+            <a href="{% url 'projects:list' %}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">Ver Todos</a>
+        </div>
+        <div class="p-6">
+            {% if recent_projects %}
+                <div class="space-y-4">
+                    {% for project in recent_projects %}
+                        <a href="{% url 'projects:detail' project.pk %}" 
+                           class="block p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <div class="flex justify-between items-start">
+                                <h6 class="font-medium text-gray-900 dark:text-white">{{ project.title }}</h6>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ project.created_at|date:"d/m/Y" }}</span>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ project.description|truncatewords:20 }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-500 dark:text-gray-400">Nenhum projeto criado ainda.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tarefas Próximas -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Tarefas Próximas</h5>
+            <a href="{% url 'tasks:list' %}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">Ver Todas</a>
+        </div>
+        <div class="p-6">
+            {% if upcoming_tasks %}
+                <div class="space-y-4">
+                    {% for task in upcoming_tasks %}
+                        <a href="{% url 'tasks:detail' task.pk %}" 
+                           class="block p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <div class="flex justify-between items-start">
+                                <h6 class="font-medium text-gray-900 dark:text-white">{{ task.title }}</h6>
+                                <span class="px-2 py-1 text-xs rounded-full 
+                                    {% if task.priority == 'high' %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                    {% elif task.priority == 'medium' %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                    {% else %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200{% endif %}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ task.description|truncatewords:20 }}</p>
+                            <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                Projeto: {{ task.project.title }} | 
+                                Prazo: {{ task.due_date|date:"d/m/Y H:i" }}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-500 dark:text-gray-400">Nenhuma tarefa próxima.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Status das Tarefas e Prioridades -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Status das Tarefas</h5>
+        </div>
+        <div class="p-6">
+            {% with total_tasks=stats.total_tasks|default:1 %}
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-gray-500 dark:bg-gray-500" style="width: {% widthratio stats.tasks_todo total_tasks 100 %}%"></div>
+                    <div class="h-full bg-blue-500 dark:bg-blue-600" style="width: {% widthratio stats.tasks_doing total_tasks 100 %}%"></div>
+                    <div class="h-full bg-green-500 dark:bg-green-600" style="width: {% widthratio stats.tasks_done total_tasks 100 %}%"></div>
+                </div>
+                <div class="mt-4 flex justify-between text-sm">
+                    <span class="text-gray-600 dark:text-gray-300">A Fazer ({{ stats.tasks_todo }})</span>
+                    <span class="text-blue-600 dark:text-blue-400">Em Andamento ({{ stats.tasks_doing }})</span>
+                    <span class="text-green-600 dark:text-green-400">Concluídas ({{ stats.tasks_done }})</span>
+                </div>
+            {% endwith %}
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Tarefas por Prioridade</h5>
+        </div>
+        <div class="p-6">
+            {% with total_tasks=stats.total_tasks|default:1 %}
+                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-red-500 dark:bg-red-600" style="width: {% widthratio stats.tasks_by_priority.high total_tasks 100 %}%"></div>
+                    <div class="h-full bg-yellow-500 dark:bg-yellow-600" style="width: {% widthratio stats.tasks_by_priority.medium total_tasks 100 %}%"></div>
+                    <div class="h-full bg-green-500 dark:bg-green-600" style="width: {% widthratio stats.tasks_by_priority.low total_tasks 100 %}%"></div>
+                </div>
+                <div class="mt-4 flex justify-between text-sm">
+                    <span class="text-red-600 dark:text-red-400">Alta ({{ stats.tasks_by_priority.high }})</span>
+                    <span class="text-yellow-600 dark:text-yellow-400">Média ({{ stats.tasks_by_priority.medium }})</span>
+                    <span class="text-green-600 dark:text-green-400">Baixa ({{ stats.tasks_by_priority.low }})</span>
+                </div>
+            {% endwith %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

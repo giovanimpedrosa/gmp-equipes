@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="h-full" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" 
+      x-bind:class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gerenciador de Tarefas{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Suas cores personalizadas aqui
+                    }
+                }
+            }
+        }
+
+        // Função para inicializar o tema
+        document.addEventListener('alpine:init', () => {
+            if (localStorage.getItem('darkMode') === null) {
+                localStorage.setItem('darkMode', window.matchMedia('(prefers-color-scheme: dark)').matches)
+            }
+        })
+    </script>
+</head>  
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <nav class="bg-indigo-600 dark:bg-indigo-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'users:dashboard' %}" class="text-white font-bold text-xl">
+                        Gerenciador de Tarefas
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Botão Dark Mode -->
+                    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" 
+                            class="p-2 text-white hover:text-gray-200 rounded-lg">
+                        <!-- Ícone Sol (Light Mode) -->
+                        <svg x-show="darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <!-- Ícone Lua (Dark Mode) -->
+                        <svg x-show="!darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                        <div class="flex items-center space-x-4">
+                            <a href="{% url 'users:dashboard' %}" class="text-white hover:text-gray-200">
+                                Dashboard
+                            </a>
+                            <span class="text-white">Olá, {{ user.username }}</span>
+                            <a href="{% url 'logout' %}" class="text-white hover:text-gray-200">
+                                Sair
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="flex items-center space-x-4">
+                            <a href="{% url 'login' %}" class="text-white hover:text-gray-200">
+                                Entrar
+                            </a>
+                            <a href="{% url 'users:register' %}" class="text-white hover:text-gray-200">
+                                Registrar
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200{% elif message.tags == 'error' %}bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200{% else %}bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="dark:text-white">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+</body>
+</html> 

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>{{ task.title }}</h2>
+        <p class="text-muted">
+            Projeto: <a href="{% url 'projects:detail' task.project.pk %}">{{ task.project.title }}</a>
+        </p>
+    </div>
+    <div class="col text-end">
+        <a href="{% url 'tasks:update' task.pk %}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Editar Tarefa
+        </a>
+        <a href="{% url 'tasks:delete' task.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Excluir Tarefa
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Descrição</h5>
+                <p class="card-text">{{ task.description }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Detalhes</h5>
+                <ul class="list-unstyled">
+                    <li><strong>Prioridade:</strong> 
+                        <span class="badge bg-{{ task.get_priority_color }}">{{ task.get_priority_display }}</span>
+                    </li>
+                    <li><strong>Status:</strong> 
+                        <span class="badge bg-{{ task.get_status_color }}">{{ task.get_status_display }}</span>
+                    </li>
+                    <li><strong>Prazo:</strong> {{ task.due_date|date:"d/m/Y H:i" }}</li>
+                    <li><strong>Criada em:</strong> {{ task.created_at|date:"d/m/Y" }}</li>
+                    <li><strong>Última atualização:</strong> {{ task.updated_at|date:"d/m/Y H:i" }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

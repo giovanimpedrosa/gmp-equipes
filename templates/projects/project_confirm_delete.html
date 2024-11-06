@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Projeto{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Excluir Projeto</h3>
+                <p class="card-text">Tem certeza que deseja excluir o projeto "{{ project.title }}"?</p>
+                <p class="card-text text-danger">
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita e todas as tarefas associadas serão excluídas.
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                    <a href="{% url 'projects:detail' project.pk %}" class="btn btn-secondary">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
