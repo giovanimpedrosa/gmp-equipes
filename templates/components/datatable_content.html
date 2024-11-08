@@ -2,117 +2,181 @@
 <div class="datatable-items">
     {% if view_type == 'list' %}
         <!-- Visualização em Lista (Tabela) -->
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                    {% for column in columns %}
-                        <th scope="col" 
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            {{ column.label }}
-                        </th>
-                    {% endfor %}
-                    <th scope="col" class="relative px-6 py-3">
-                        <span class="sr-only">Ações</span>
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {% for item in items %}
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        {% if view_name == 'projects' %}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.title }}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.description|truncatewords:30 }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.tasks_count }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.created_at|date:"d/m/Y H:i" }}
-                            </td>
-                        {% else %}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.title }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.project.title }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ item.due_date|date:"d/m/Y H:i" }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <span class="px-2 py-1 text-xs rounded-full {{ item.get_priority_display_class }}">
-                                    {{ item.get_priority_display }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <span class="px-2 py-1 text-xs rounded-full {{ item.get_status_display_class }}">
-                                    {{ item.get_status_display }}
-                                </span>
-                            </td>
-                        {% endif %}
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex justify-end space-x-2">
-                                <a href="{% url view_name|add:':detail' item.pk %}" 
-                                   class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                    Ver
-                                </a>
-                                <a href="{% url view_name|add:':update' item.pk %}" 
-                                   class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
-                                    Editar
-                                </a>
-                                <button hx-delete="{% url view_name|add:':delete' item.pk %}"
-                                        hx-confirm="Tem certeza que deseja excluir este item?"
-                                        hx-target="closest tr"
-                                        hx-swap="outerHTML"
-                                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
-                                    Excluir
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="{{ columns|length|add:1 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                            Nenhum registro encontrado.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="overflow-x-auto relative [&::-webkit-scrollbar]:h-2 
+                    [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800
+                    [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600
+                    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+            <div class="inline-block min-w-full">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <!-- Coluna de Ações fixa -->
+                            <th scope="col" class="sticky left-0 z-10 bg-gray-50 dark:bg-gray-700 px-6 py-3">
+                                <span class="sr-only">Ações</span>
+                            </th>
+                            <!-- Coluna de Imagem -->
+                            {% if view_name == 'projects' %}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Imagem
+                                </th>
+                            {% endif %}
+                            <!-- Demais colunas -->
+                            {% for column in columns %}
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    {{ column.label }}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for item in items %}
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <!-- Ações como primeira coluna fixa -->
+                                <td class="sticky left-0 z-10 bg-white dark:bg-gray-800 px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <a href="{% url view_name|add:':detail' item.pk %}" 
+                                           class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                            Ver
+                                        </a>
+                                        <a href="{% url view_name|add:':update' item.pk %}" 
+                                           class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                                            Editar
+                                        </a>
+                                        <button hx-delete="{% url view_name|add:':delete' item.pk %}"
+                                                hx-confirm="Tem certeza que deseja excluir este item?"
+                                                hx-target="closest tr"
+                                                hx-swap="outerHTML"
+                                                class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                                            Excluir
+                                        </button>
+                                    </div>
+                                </td>
+                                <!-- Coluna de Imagem -->
+                                {% if view_name == 'projects' %}
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if item.photo %}
+                                            <img src="{{ item.photo.url }}" alt="Foto do projeto" class="w-10 h-10 rounded-full object-cover">
+                                        {% else %}
+                                            <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                                <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                <!-- Demais colunas -->
+                                {% for column in columns %}
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                        {% if view_name == 'projects' %}
+                                            {% if column.key == 'title' %}
+                                                {{ item.title }}
+                                            {% elif column.key == 'description' %}
+                                                {{ item.description|truncatewords:30 }}
+                                            {% elif column.key == 'value' %}
+                                                R$ {{ item.value|floatformat:2 }}
+                                            {% elif column.key == 'is_active' %}
+                                                {% if item.is_active %}
+                                                    <span class="text-green-600 dark:text-green-400">✓</span>
+                                                {% else %}
+                                                    <span class="text-red-600 dark:text-red-400">✗</span>
+                                                {% endif %}
+                                            {% elif column.key == 'created_at' %}
+                                                {{ item.created_at|date:"d/m/Y H:i" }}
+                                            {% endif %}
+                                        {% else %}
+                                            {% if column.key == 'title' %}
+                                                {{ item.title }}
+                                            {% elif column.key == 'project' %}
+                                                {{ item.project.title }}
+                                            {% elif column.key == 'due_date' %}
+                                                {{ item.due_date|date:"d/m/Y H:i" }}
+                                            {% elif column.key == 'priority' %}
+                                                <span class="px-2 py-1 text-xs rounded-full {{ item.get_priority_display_class }}">
+                                                    {{ item.get_priority_display }}
+                                                </span>
+                                            {% elif column.key == 'status' %}
+                                                <span class="px-2 py-1 text-xs rounded-full {{ item.get_status_display_class }}">
+                                                    {{ item.get_status_display }}
+                                                </span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="{{ columns|length|add:1 }}" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                    Nenhum registro encontrado.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% else %}
         <!-- Visualização em Grid (Cards) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
             {% for item in items %}
-                <div class="datatable-item bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                    <div class="datatable-item-content p-4">
-                        {% if view_name == 'tasks' %}
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ item.title }}</h3>
-                                <span class="px-2 py-1 text-xs rounded-full {{ item.get_priority_display_class }}">
-                                    {{ item.get_priority_display }}
-                                </span>
-                            </div>
-                            <p class="mt-2 text-gray-600 dark:text-gray-300">{{ item.description|truncatewords:30 }}</p>
-                            <div class="mt-4 flex justify-between items-center">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">
-                                    Prazo: {{ item.due_date|date:"d/m/Y H:i" }}
-                                </span>
-                                <span class="px-2 py-1 text-xs rounded-full {{ item.get_status_display_class }}">
-                                    {{ item.get_status_display }}
-                                </span>
-                            </div>
+                <div class="datatable-item bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col h-full">
+                    <!-- Imagem do Card -->
+                    {% if view_name == 'projects' %}
+                        {% if item.photo %}
+                            <img src="{{ item.photo.url }}" alt="Foto do projeto" class="h-48 w-full object-cover rounded-t-lg">
                         {% else %}
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ item.title }}</h3>
-                            <p class="mt-2 text-gray-600 dark:text-gray-300">{{ item.description|truncatewords:30 }}</p>
-                            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                                Criado em: {{ item.created_at|date:"d/m/Y" }}
-                            </p>
+                            <div class="h-48 w-full bg-gray-200 dark:bg-gray-600 rounded-t-lg flex items-center justify-center">
+                                <svg class="w-16 h-16 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
                         {% endif %}
+                    {% endif %}
+                    <!-- Conteúdo do Card -->
+                    <div class="p-4 flex-grow">
+                        {% for column in columns %}
+                            <div class="mb-2">
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ column.label }}:</span>
+                                <span class="ml-2 text-gray-900 dark:text-white">
+                                    {% if view_name == 'projects' %}
+                                        {% if column.key == 'title' %}
+                                            {{ item.title }}
+                                        {% elif column.key == 'description' %}
+                                            {{ item.description|truncatewords:30 }}
+                                        {% elif column.key == 'value' %}
+                                            R$ {{ item.value|floatformat:2 }}
+                                        {% elif column.key == 'is_active' %}
+                                            {% if item.is_active %}
+                                                <span class="text-green-600 dark:text-green-400">✓ Ativo</span>
+                                            {% else %}
+                                                <span class="text-red-600 dark:text-red-400">✗ Inativo</span>
+                                            {% endif %}
+                                        {% elif column.key == 'created_at' %}
+                                            {{ item.created_at|date:"d/m/Y H:i" }}
+                                        {% endif %}
+                                    {% else %}
+                                        {% if column.key == 'title' %}
+                                            {{ item.title }}
+                                        {% elif column.key == 'project' %}
+                                            {{ item.project.title }}
+                                        {% elif column.key == 'due_date' %}
+                                            {{ item.due_date|date:"d/m/Y H:i" }}
+                                        {% elif column.key == 'priority' %}
+                                            <span class="px-2 py-1 text-xs rounded-full {{ item.get_priority_display_class }}">
+                                                {{ item.get_priority_display }}
+                                            </span>
+                                        {% elif column.key == 'status' %}
+                                            <span class="px-2 py-1 text-xs rounded-full {{ item.get_status_display_class }}">
+                                                {{ item.get_status_display }}
+                                            </span>
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <div class="datatable-item-actions px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
+                    <!-- Ações do Card -->
+                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
                         <div class="flex justify-end space-x-2">
                             <a href="{% url view_name|add:':detail' item.pk %}" 
                                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
@@ -165,3 +229,16 @@
         </nav>
     </div>
 {% endif %} 
+
+<style>
+    /* Estilo para Firefox */
+    .datatable-items .overflow-x-auto {
+        scrollbar-width: thin;
+        scrollbar-color: #D1D5DB #F3F4F6;  /* thumb track */
+    }
+
+    /* Estilo para Firefox no tema dark */
+    .dark .datatable-items .overflow-x-auto {
+        scrollbar-color: #4B5563 #1F2937;  /* thumb track */
+    }
+</style> 

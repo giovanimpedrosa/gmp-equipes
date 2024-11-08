@@ -4,7 +4,7 @@ from .models import Project
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'description']
+        fields = ['title', 'description', 'photo']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         } 

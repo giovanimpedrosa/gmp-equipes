@@ -1,23 +1,35 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="h-full" 
-      data-theme="{% if user.is_authenticated %}{{ user.theme_preference }}{% else %}light{% endif %}"
-      {% if user.is_authenticated %}data-user="{{ user.username }}"{% endif %}>
+<html lang="pt-br" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Gerenciador de Tarefas{% endblock %}</title>
+    <!-- Google Fonts - Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
-                extend: {}
+                extend: {
+                    fontFamily: {
+                        'sans': ['Roboto', 'sans-serif'],
+                    },
+                }
             }
         }
     </script>
     <style>
+        /* Aplicando Roboto como fonte padrão */
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
         /* Estilos padrão para elementos de entrada */
         input[type="text"],
         input[type="email"],
@@ -25,11 +37,14 @@
         input[type="search"],
         input[type="date"],
         input[type="datetime-local"],
+        input[type="number"],
         textarea,
         select {
-            @apply px-4 py-2 rounded-md border-gray-300 dark:border-gray-600 
-                   shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
-                   dark:bg-gray-700 dark:text-white w-full;
+            @apply rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                   border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400
+                   focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                   focus:border-none focus:ring-0
+                   transition-colors duration-200;
         }
 
         /* Estilos para labels */
@@ -39,13 +54,13 @@
 
         /* Estilos para grupos de formulário */
         .form-group {
-            @apply mb-4 px-4 py-2;
+            @apply mb-4;
         }
 
         /* Estilos para botões */
         button, 
         .btn {
-            @apply px-4 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2;
+            @apply rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2;
         }
 
         /* Variantes de botões */
@@ -69,7 +84,33 @@
 
         /* Container para elementos de formulário */
         .form-container {
-            @apply px-4 py-2;
+            @apply mb-4;
+        }
+
+        /* Estilos específicos para títulos */
+        h1, h2, h3, h4, h5, h6 {
+            @apply font-medium;
+        }
+
+        /* Estilos para texto do corpo */
+        p {
+            @apply font-normal;
+        }
+
+        /* Estilos para botões de ação */
+        .btn-action {
+            @apply px-4 py-2 border border-indigo-600 dark:border-indigo-500 
+                   text-indigo-600 dark:text-indigo-500 rounded-md 
+                   hover:bg-indigo-600 dark:hover:bg-indigo-500 
+                   hover:text-white dark:hover:text-white 
+                   transition-colors duration-200;
+        }
+
+        /* Estilos para rodapés de formulários */
+        .form-footer {
+            @apply mt-auto px-4 py-3 bg-gray-50 dark:bg-gray-600 
+                   border-t border-gray-200 dark:border-gray-500 
+                   rounded-b-lg flex justify-end space-x-2;
         }
     </style>
 </head>

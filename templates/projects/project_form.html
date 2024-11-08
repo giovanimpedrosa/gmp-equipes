@@ -4,42 +4,118 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white px-4 py-2">{{ action }} Projeto</h2>
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <form method="post" class="form-container">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Projeto</h2>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
+        <form method="post" enctype="multipart/form-data" class="flex flex-col h-full">
             {% csrf_token %}
-            {% for field in form %}
-                <div class="mb-4 px-4 py-2">
-                    <label for="{{ field.id_for_label }}" 
-                           class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {{ field.label }}
-                    </label>
-                    {% if field.errors %}
-                        <div class="text-red-600 dark:text-red-400 text-sm mb-2">
-                            {{ field.errors }}
-                        </div>
-                    {% endif %}
-                    
-                    {% if field.name == 'description' %}
-                        <textarea name="{{ field.name }}" 
-                                id="{{ field.id_for_label }}"
-                                rows="4">{{ field.value|default:'' }}</textarea>
-                    {% else %}
-                        <input type="{{ field.field.widget.input_type }}" 
-                               name="{{ field.name }}"
-                               id="{{ field.id_for_label }}"
-                               value="{{ field.value|default:'' }}">
-                    {% endif %}
-                    
-                    {% if field.help_text %}
-                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
-                    {% endif %}
+            <div class="p-6 flex-grow">
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" 
+                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {{ field.label }}
+                        </label>
+
+                        {% if field.name == 'photo' %}
+                            <div class="mt-1 flex items-center">
+                                {% if project.photo %}
+                                    <div class="mb-3">
+                                        <img src="{{ project.photo.url }}" 
+                                             alt="Foto atual" 
+                                             class="w-32 h-32 object-cover rounded-lg">
+                                    </div>
+                                {% endif %}
+                                <input type="file" 
+                                       name="{{ field.name }}"
+                                       id="{{ field.id_for_label }}"
+                                       accept="image/*"
+                                       class="block w-full text-sm text-gray-900 dark:text-white
+                                              file:mr-4 file:py-2 file:px-4
+                                              file:rounded-md file:border-0
+                                              file:text-sm file:font-medium
+                                              file:bg-indigo-50 file:text-indigo-700
+                                              dark:file:bg-indigo-900 dark:file:text-indigo-300
+                                              hover:file:bg-indigo-100 dark:hover:file:bg-indigo-800
+                                              transition-colors duration-200
+                                              {% if field.errors %}border-2 border-red-500{% endif %}">
+                            </div>
+                        {% elif field.name == 'description' %}
+                            <textarea name="{{ field.name }}" 
+                                    id="{{ field.id_for_label }}"
+                                    rows="4"
+                                    class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                           {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
+                                           focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                           focus:border-none focus:ring-0
+                                           transition-colors duration-200
+                                           px-4 py-3">{{ field.value|default:'' }}</textarea>
+                        {% elif field.name == 'value' %}
+                            <input type="number" 
+                                   name="{{ field.name }}"
+                                   id="{{ field.id_for_label }}"
+                                   value="{{ field.value|default:'' }}"
+                                   step="0.01"
+                                   class="w-1/4 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                          {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
+                                          focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                          focus:border-none focus:ring-0
+                                          transition-colors duration-200
+                                          px-4 py-3">
+                        {% elif field.name == 'is_active' %}
+                            <div class="relative w-1/4">
+                                <label class="inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" 
+                                           name="{{ field.name }}"
+                                           id="{{ field.id_for_label }}"
+                                           {% if field.value %}checked{% endif %}
+                                           class="sr-only peer">
+                                    <div class="relative w-11 h-6 bg-gray-300 dark:bg-gray-600 
+                                                peer-focus:outline-none rounded-full peer 
+                                                peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+                                                peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
+                                                after:start-[2px] after:bg-white after:border-gray-300 after:border 
+                                                after:rounded-full after:h-5 after:w-5 after:transition-all 
+                                                peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-500
+                                                {% if field.errors %}border-2 border-red-500{% endif %}"></div>
+                                    <span class="ms-3 text-gray-800 dark:text-gray-100">Ativo</span>
+                                </label>
+                            </div>
+                        {% else %}
+                            <input type="{{ field.field.widget.input_type }}" 
+                                   name="{{ field.name }}"
+                                   id="{{ field.id_for_label }}"
+                                   value="{{ field.value|default:'' }}"
+                                   class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                          {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
+                                          focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                          focus:border-none focus:ring-0
+                                          transition-colors duration-200
+                                          px-4 py-3">
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                {{ field.errors|join:", " }}
+                            </p>
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
+                <div class="flex justify-end space-x-2">
+                    <button type="submit" 
+                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                        {{ action }}
+                    </button>
+                    <a href="{% url 'projects:list' %}" 
+                       class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                        Cancelar
+                    </a>
                 </div>
-            {% endfor %}
-            
-            <div class="flex justify-end space-x-2 px-4 py-2 bg-gray-50 dark:bg-gray-700">
-                <button type="submit" class="btn btn-primary">{{ action }}</button>
-                <a href="{% url 'projects:list' %}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

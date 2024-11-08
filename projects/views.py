@@ -29,7 +29,8 @@ def project_list(request):
     columns = [
         {'key': 'title', 'label': 'Título', 'sortable': True},
         {'key': 'description', 'label': 'Descrição', 'sortable': False},
-        {'key': 'tasks_count', 'label': 'Total de Tarefas', 'sortable': True},
+        {'key': 'value', 'label': 'Valor', 'sortable': True, 'type': 'decimal'},
+        {'key': 'is_active', 'label': 'Ativo', 'sortable': True, 'type': 'boolean'},
         {'key': 'created_at', 'label': 'Criado em', 'sortable': True},
     ]
     
@@ -51,7 +52,7 @@ def project_list(request):
 @login_required
 def project_create(request):
     if request.method == 'POST':
-        form = ProjectForm(request.POST)
+        form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project = form.save(commit=False)
             project.owner = request.user
@@ -74,7 +75,7 @@ def project_detail(request, pk):
 def project_update(request, pk):
     project = get_object_or_404(Project, pk=pk, owner=request.user)
     if request.method == 'POST':
-        form = ProjectForm(request.POST, instance=project)
+        form = ProjectForm(request.POST, request.FILES, instance=project)
         if form.is_valid():
             form.save()
             return redirect('projects:detail', pk=project.pk)

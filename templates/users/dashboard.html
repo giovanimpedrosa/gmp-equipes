@@ -56,11 +56,23 @@
                     {% for project in recent_projects %}
                         <a href="{% url 'projects:detail' project.pk %}" 
                            class="block p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <div class="flex justify-between items-start">
-                                <h6 class="font-medium text-gray-900 dark:text-white">{{ project.title }}</h6>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">{{ project.created_at|date:"d/m/Y" }}</span>
+                            <div class="flex items-center space-x-4">
+                                {% if project.photo %}
+                                    <img src="{{ project.photo.url }}" 
+                                         alt="Foto do projeto" 
+                                         class="w-12 h-12 rounded-lg object-cover">
+                                {% else %}
+                                    <div class="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                                <div class="flex-1">
+                                    <h6 class="font-medium text-gray-900 dark:text-white">{{ project.title }}</h6>
+                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">{{ project.description|truncatewords:20 }}</p>
+                                </div>
                             </div>
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{{ project.description|truncatewords:20 }}</p>
                         </a>
                     {% endfor %}
                 </div>
@@ -113,117 +125,90 @@
             <h5 class="text-lg font-medium text-gray-900 dark:text-white">Status das Tarefas</h5>
         </div>
         <div class="p-6">
-            <div class="flex items-center justify-center h-[300px]">
-                <canvas id="taskStatusChart"></canvas>
-            </div>
-            <div class="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
-                <div>
-                    <span class="block text-gray-600 dark:text-gray-300">A Fazer</span>
-                    <span class="font-bold text-gray-900 dark:text-white">{{ stats.tasks_todo }}</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Card A Fazer -->
+                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 border-l-4 border-gray-500 dark:border-gray-400">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold text-gray-700 dark:text-gray-300">
+                            {{ stats.tasks_todo }}
+                        </span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            A Fazer
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <span class="block text-blue-600 dark:text-blue-400">Em Andamento</span>
-                    <span class="font-bold text-gray-900 dark:text-white">{{ stats.tasks_doing }}</span>
+
+                <!-- Card Em Andamento -->
+                <div class="bg-blue-100 dark:bg-blue-900 rounded-lg p-4 border-l-4 border-blue-500 dark:border-blue-400">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold text-blue-700 dark:text-blue-300">
+                            {{ stats.tasks_doing }}
+                        </span>
+                        <span class="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                            Em Andamento
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <span class="block text-green-600 dark:text-green-400">Concluídas</span>
-                    <span class="font-bold text-gray-900 dark:text-white">{{ stats.tasks_done }}</span>
+
+                <!-- Card Concluídas -->
+                <div class="bg-green-100 dark:bg-green-900 rounded-lg p-4 border-l-4 border-green-500 dark:border-green-400">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold text-green-700 dark:text-green-300">
+                            {{ stats.tasks_done }}
+                        </span>
+                        <span class="text-sm text-green-600 dark:text-green-400 mt-1">
+                            Concluídas
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Prioridade das Tarefas -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Tarefas por Prioridade</h5>
+            <h5 class="text-lg font-medium text-gray-900 dark:text-white">Prioridade das Tarefas</h5>
         </div>
         <div class="p-6">
-            {% with total_tasks=stats.total_tasks|default:1 %}
-                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div class="h-full bg-red-500 dark:bg-red-600" style="width: {% widthratio stats.tasks_by_priority.high total_tasks 100 %}%"></div>
-                    <div class="h-full bg-yellow-500 dark:bg-yellow-600" style="width: {% widthratio stats.tasks_by_priority.medium total_tasks 100 %}%"></div>
-                    <div class="h-full bg-green-500 dark:bg-green-600" style="width: {% widthratio stats.tasks_by_priority.low total_tasks 100 %}%"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Card Baixa Prioridade -->
+                <div class="bg-green-100 dark:bg-green-900 rounded-lg p-4 border-l-4 border-green-500 dark:border-green-400">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold text-green-700 dark:text-green-300">
+                            {{ stats.tasks_by_priority.low }}
+                        </span>
+                        <span class="text-sm text-green-600 dark:text-green-400 mt-1">
+                            Baixa
+                        </span>
+                    </div>
                 </div>
-                <div class="mt-4 flex justify-between text-sm">
-                    <span class="text-red-600 dark:text-red-400">Alta ({{ stats.tasks_by_priority.high }})</span>
-                    <span class="text-yellow-600 dark:text-yellow-400">Média ({{ stats.tasks_by_priority.medium }})</span>
-                    <span class="text-green-600 dark:text-green-400">Baixa ({{ stats.tasks_by_priority.low }})</span>
+
+                <!-- Card Média Prioridade -->
+                <div class="bg-yellow-100 dark:bg-yellow-900 rounded-lg p-4 border-l-4 border-yellow-500 dark:border-yellow-400">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold text-yellow-700 dark:text-yellow-300">
+                            {{ stats.tasks_by_priority.medium }}
+                        </span>
+                        <span class="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
+                            Média
+                        </span>
+                    </div>
                 </div>
-            {% endwith %}
+
+                <!-- Card Alta Prioridade -->
+                <div class="bg-red-100 dark:bg-red-900 rounded-lg p-4 border-l-4 border-red-500 dark:border-red-400">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl font-bold text-red-700 dark:text-red-300">
+                            {{ stats.tasks_by_priority.high }}
+                        </span>
+                        <span class="text-sm text-red-600 dark:text-red-400 mt-1">
+                            Alta
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-<script>
-function initializeChart() {
-    const isDarkMode = document.documentElement.classList.contains('dark');
-    const textColor = isDarkMode ? '#ffffff' : '#000000';
-    
-    // Destruir o gráfico existente se houver
-    const existingChart = Chart.getChart('taskStatusChart');
-    if (existingChart) {
-        existingChart.destroy();
-    }
-    
-    const ctx = document.getElementById('taskStatusChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['A Fazer', 'Em Andamento', 'Concluídas'],
-            datasets: [{
-                data: [
-                    {{ stats.tasks_todo }}, 
-                    {{ stats.tasks_doing }}, 
-                    {{ stats.tasks_done }}
-                ],
-                backgroundColor: [
-                    isDarkMode ? '#4B5563' : '#9CA3AF',  // Cinza
-                    isDarkMode ? '#3B82F6' : '#60A5FA',  // Azul
-                    isDarkMode ? '#10B981' : '#34D399'   // Verde
-                ],
-                borderColor: isDarkMode ? '#1F2937' : '#ffffff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                },
-                tooltip: {
-                    backgroundColor: isDarkMode ? '#374151' : '#ffffff',
-                    titleColor: textColor,
-                    bodyColor: textColor,
-                    borderColor: isDarkMode ? '#4B5563' : '#E5E7EB',
-                    borderWidth: 1,
-                    callbacks: {
-                        label: function(context) {
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const value = context.raw;
-                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                            return `${context.label}: ${value} (${percentage}%)`;
-                        }
-                    }
-                }
-            },
-            cutout: '60%'
-        }
-    });
-}
-
-// Inicializar o gráfico quando o documento estiver pronto
-document.addEventListener('DOMContentLoaded', initializeChart);
-
-// Atualizar o gráfico quando o tema mudar
-document.addEventListener('alpine:initialized', () => {
-    Alpine.data('darkMode', () => ({
-        init() {
-            this.$watch('darkMode', () => {
-                initializeChart();
-            });
-        }
-    }));
-});
 {% endblock %} 

@@ -1,0 +1,19 @@
+{% if column.template %}
+    {% include column.template with value=value %}
+{% elif column.type == 'date' %}
+    {{ value|date:column.date_format|default:"d/m/Y" }}
+{% elif column.type == 'datetime' %}
+    {{ value|date:column.date_format|default:"d/m/Y H:i" }}
+{% elif column.type == 'badge' %}
+    <span class="px-2 py-1 text-xs rounded-full {{ value.class }}">
+        {{ value.text }}
+    </span>
+{% elif column.type == 'boolean' %}
+    {% if value %}
+        <span class="text-green-600 dark:text-green-400">✓</span>
+    {% else %}
+        <span class="text-red-600 dark:text-red-400">✗</span>
+    {% endif %}
+{% else %}
+    {{ value|default:"-" }}
+{% endif %} 
