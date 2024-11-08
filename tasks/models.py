@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from projects.models import Project
 
 class Task(models.Model):
@@ -39,7 +40,6 @@ class Task(models.Model):
     updated_at = models.DateTimeField('Atualizado em', auto_now=True)
 
     class Meta:
-        db_table = 'tasks_task'
         verbose_name = 'Tarefa'
         verbose_name_plural = 'Tarefas'
         ordering = ['due_date']
@@ -47,16 +47,16 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
-    def get_priority_color(self):
+    def get_priority_display_class(self):
         return {
-            'low': 'success',
-            'medium': 'warning',
-            'high': 'danger'
-        }.get(self.priority, 'secondary')
+            'low': 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200',
+            'medium': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
+            'high': 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
+        }.get(self.priority, '')
 
-    def get_status_color(self):
+    def get_status_display_class(self):
         return {
-            'todo': 'secondary',
-            'doing': 'primary',
-            'done': 'success'
-        }.get(self.status, 'secondary')
+            'todo': 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+            'doing': 'bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200',
+            'done': 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+        }.get(self.status, '')

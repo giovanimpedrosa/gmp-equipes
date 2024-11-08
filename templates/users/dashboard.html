@@ -106,25 +106,30 @@
     </div>
 </div>
 
-<!-- Status das Tarefas e Prioridades -->
+<!-- Status das Tarefas -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h5 class="text-lg font-medium text-gray-900 dark:text-white">Status das Tarefas</h5>
         </div>
         <div class="p-6">
-            {% with total_tasks=stats.total_tasks|default:1 %}
-                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div class="h-full bg-gray-500 dark:bg-gray-500" style="width: {% widthratio stats.tasks_todo total_tasks 100 %}%"></div>
-                    <div class="h-full bg-blue-500 dark:bg-blue-600" style="width: {% widthratio stats.tasks_doing total_tasks 100 %}%"></div>
-                    <div class="h-full bg-green-500 dark:bg-green-600" style="width: {% widthratio stats.tasks_done total_tasks 100 %}%"></div>
+            <div class="flex items-center justify-center h-[300px]">
+                <canvas id="taskStatusChart"></canvas>
+            </div>
+            <div class="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
+                <div>
+                    <span class="block text-gray-600 dark:text-gray-300">A Fazer</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ stats.tasks_todo }}</span>
                 </div>
-                <div class="mt-4 flex justify-between text-sm">
-                    <span class="text-gray-600 dark:text-gray-300">A Fazer ({{ stats.tasks_todo }})</span>
-                    <span class="text-blue-600 dark:text-blue-400">Em Andamento ({{ stats.tasks_doing }})</span>
-                    <span class="text-green-600 dark:text-green-400">Concluídas ({{ stats.tasks_done }})</span>
+                <div>
+                    <span class="block text-blue-600 dark:text-blue-400">Em Andamento</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ stats.tasks_doing }}</span>
                 </div>
-            {% endwith %}
+                <div>
+                    <span class="block text-green-600 dark:text-green-400">Concluídas</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ stats.tasks_done }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -148,4 +153,77 @@
         </div>
     </div>
 </div>
+
+<script>
+function initializeChart() {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#ffffff' : '#000000';
+    
+    // Destruir o gráfico existente se houver
+    const existingChart = Chart.getChart('taskStatusChart');
+    if (existingChart) {
+        existingChart.destroy();
+    }
+    
+    const ctx = document.getElementById('taskStatusChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['A Fazer', 'Em Andamento', 'Concluídas'],
+            datasets: [{
+                data: [
+                    {{ stats.tasks_todo }}, 
+                    {{ stats.tasks_doing }}, 
+                    {{ stats.tasks_done }}
+                ],
+                backgroundColor: [
+                    isDarkMode ? '#4B5563' : '#9CA3AF',  // Cinza
+                    isDarkMode ? '#3B82F6' : '#60A5FA',  // Azul
+                    isDarkMode ? '#10B981' : '#34D399'   // Verde
+                ],
+                borderColor: isDarkMode ? '#1F2937' : '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                tooltip: {
+                    backgroundColor: isDarkMode ? '#374151' : '#ffffff',
+                    titleColor: textColor,
+                    bodyColor: textColor,
+                    borderColor: isDarkMode ? '#4B5563' : '#E5E7EB',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.raw;
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+}
+
+// Inicializar o gráfico quando o documento estiver pronto
+document.addEventListener('DOMContentLoaded', initializeChart);
+
+// Atualizar o gráfico quando o tema mudar
+document.addEventListener('alpine:initialized', () => {
+    Alpine.data('darkMode', () => ({
+        init() {
+            this.$watch('darkMode', () => {
+                initializeChart();
+            });
+        }
+    }));
+});
 {% endblock %} 

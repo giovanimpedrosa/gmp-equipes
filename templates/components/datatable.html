@@ -1,0 +1,116 @@
+{% load datatable_tags %}
+
+<!-- Container principal -->
+<div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+    <!-- Cabeçalho com busca e toggle de visualização -->
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-4">
+            <form class="flex-1 flex gap-2" hx-get="{{ request.path }}" hx-target=".datatable-content" hx-swap="innerHTML">
+                <input type="search" 
+                       name="search" 
+                       value="{{ request.GET.search }}"
+                       placeholder="Buscar..." 
+                       class="flex-1 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white
+                              border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400
+                              focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                              focus:border-none focus:ring-0
+                              transition-colors duration-200 px-2">
+                <input type="hidden" name="view" id="view-type-input" value="{{ view_type|default:'grid' }}">
+                <button type="submit" 
+                        class="px-4 py-2 border border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-500 rounded-md 
+                               hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white transition-colors duration-200">
+                    Buscar
+                </button>
+            </form>
+            
+            <!-- Toggle de visualização -->
+            <div class="flex items-center ml-4 space-x-2">
+                <button onclick="toggleView('grid')"
+                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                        id="grid-view-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                </button>
+                <button onclick="toggleView('list')"
+                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                        id="list-view-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo que será atualizado -->
+    <div class="datatable-content">
+        {% include "components/datatable_content.html" with view_type=view_type|default:'grid' %}
+    </div>
+</div>
+
+<script>
+    // Recupera a preferência de visualização
+    const currentView = localStorage.getItem('datatableView') || 'grid';
+    
+    // Aplica a visualização inicial
+    document.addEventListener('DOMContentLoaded', function() {
+        setViewStyle(currentView);
+        updateViewButtons(currentView);
+        document.getElementById('view-type-input').value = currentView;
+    });
+
+    // Função para alternar entre visualizações
+    function toggleView(viewType) {
+        setViewStyle(viewType);
+        updateViewButtons(viewType);
+        localStorage.setItem('datatableView', viewType);
+        
+        // Atualiza o input hidden e dispara a busca
+        const viewInput = document.getElementById('view-type-input');
+        viewInput.value = viewType;
+        
+        // Dispara a requisição HTMX manualmente
+        const searchForm = viewInput.closest('form');
+        const url = `${searchForm.getAttribute('hx-get')}?${new URLSearchParams(new FormData(searchForm))}`;
+        htmx.ajax('GET', url, {target: '.datatable-content'});
+    }
+
+    // Função para atualizar o estilo de visualização
+    function setViewStyle(viewType) {
+        const container = document.querySelector('.datatable-content');
+        if (container) {
+            container.setAttribute('data-view', viewType);
+        }
+    }
+
+    // Função para atualizar os botões de visualização
+    function updateViewButtons(viewType) {
+        document.getElementById('grid-view-btn').classList.toggle('text-indigo-600', viewType === 'grid');
+        document.getElementById('list-view-btn').classList.toggle('text-indigo-600', viewType === 'list');
+    }
+</script>
+
+<style>
+    /* Estilos para visualização em grid */
+    .grid-view .datatable-items {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4;
+    }
+
+    /* Estilos para visualização em lista */
+    .list-view .datatable-items {
+        @apply divide-y divide-gray-200 dark:divide-gray-700;
+    }
+
+    .list-view .datatable-item {
+        @apply flex items-center justify-between p-4;
+    }
+
+    .list-view .datatable-item-content {
+        @apply flex-1;
+    }
+
+    .list-view .datatable-item-actions {
+        @apply flex items-center space-x-2;
+    }
+</style> 

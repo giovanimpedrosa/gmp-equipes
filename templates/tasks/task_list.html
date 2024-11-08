@@ -3,47 +3,16 @@
 {% block title %}Minhas Tarefas{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h2>Minhas Tarefas</h2>
-    </div>
-    <div class="col text-end">
-        <a href="{% url 'tasks:create' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nova Tarefa
-        </a>
-    </div>
+<div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Minhas Tarefas</h2>
+    <a href="{% url 'tasks:create' %}" 
+       class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nova Tarefa
+    </a>
 </div>
 
-<div class="row">
-    {% if tasks %}
-        {% for task in tasks %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 {% if task.status == 'done' %}border-success{% endif %}">
-                    <div class="card-header">
-                        <span class="badge bg-{{ task.get_priority_color }}">{{ task.get_priority_display }}</span>
-                        <span class="badge bg-{{ task.get_status_color }}">{{ task.get_status_display }}</span>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ task.title }}</h5>
-                        <p class="card-text">{{ task.description|truncatewords:30 }}</p>
-                        <p class="card-text">
-                            <small class="text-muted">Projeto: {{ task.project.title }}</small><br>
-                            <small class="text-muted">Prazo: {{ task.due_date|date:"d/m/Y H:i" }}</small>
-                        </p>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <a href="{% url 'tasks:detail' task.pk %}" class="btn btn-primary btn-sm">Ver Detalhes</a>
-                        <a href="{% url 'tasks:update' task.pk %}" class="btn btn-secondary btn-sm">Editar</a>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="col">
-            <div class="alert alert-info">
-                Você ainda não tem tarefas. <a href="{% url 'tasks:create' %}">Crie sua primeira tarefa</a>!
-            </div>
-        </div>
-    {% endif %}
-</div>
+{% include "components/datatable.html" %}
 {% endblock %} 

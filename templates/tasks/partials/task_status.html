@@ -1,0 +1,6 @@
+<span class="px-2 py-1 text-xs rounded-full 
+    {% if task.status == 'todo' %}bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200
+    {% elif task.status == 'doing' %}bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200
+    {% else %}bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-200{% endif %}">
+    {{ task.get_status_display }}
+</span> 

@@ -13,10 +13,18 @@ class Project(models.Model):
     )
 
     class Meta:
-        db_table = 'projects_project'
         verbose_name = 'Projeto'
         verbose_name_plural = 'Projetos'
         ordering = ['-created_at']
 
     def __str__(self):
-        return self.title 
+        return self.title
+
+    def get_tasks_count(self):
+        return self.tasks.count()
+
+    def get_status_summary(self):
+        todo = self.tasks.filter(status='todo').count()
+        doing = self.tasks.filter(status='doing').count()
+        done = self.tasks.filter(status='done').count()
+        return f"A fazer: {todo}, Em andamento: {doing}, Concluídas: {done}" 

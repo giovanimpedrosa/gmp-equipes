@@ -1,33 +1,80 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="h-full" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" 
-      x-bind:class="{ 'dark': darkMode }">
+<html lang="pt-br" class="h-full" 
+      data-theme="{% if user.is_authenticated %}{{ user.theme_preference }}{% else %}light{% endif %}"
+      {% if user.is_authenticated %}data-user="{{ user.username }}"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Gerenciador de Tarefas{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
-                extend: {
-                    colors: {
-                        // Suas cores personalizadas aqui
-                    }
-                }
+                extend: {}
             }
         }
-
-        // Função para inicializar o tema
-        document.addEventListener('alpine:init', () => {
-            if (localStorage.getItem('darkMode') === null) {
-                localStorage.setItem('darkMode', window.matchMedia('(prefers-color-scheme: dark)').matches)
-            }
-        })
     </script>
-</head>  
+    <style>
+        /* Estilos padrão para elementos de entrada */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="search"],
+        input[type="date"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            @apply px-4 py-2 rounded-md border-gray-300 dark:border-gray-600 
+                   shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
+                   dark:bg-gray-700 dark:text-white w-full;
+        }
+
+        /* Estilos para labels */
+        label {
+            @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+        }
+
+        /* Estilos para grupos de formulário */
+        .form-group {
+            @apply mb-4 px-4 py-2;
+        }
+
+        /* Estilos para botões */
+        button, 
+        .btn {
+            @apply px-4 py-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2;
+        }
+
+        /* Variantes de botões */
+        .btn-primary {
+            @apply bg-indigo-600 text-white hover:bg-indigo-700 
+                   dark:bg-indigo-500 dark:hover:bg-indigo-600 
+                   focus:ring-indigo-500;
+        }
+
+        .btn-secondary {
+            @apply bg-gray-600 text-white hover:bg-gray-700 
+                   dark:bg-gray-500 dark:hover:bg-gray-600 
+                   focus:ring-gray-500;
+        }
+
+        .btn-danger {
+            @apply bg-red-600 text-white hover:bg-red-700 
+                   dark:bg-red-500 dark:hover:bg-red-600 
+                   focus:ring-red-500;
+        }
+
+        /* Container para elementos de formulário */
+        .form-container {
+            @apply px-4 py-2;
+        }
+    </style>
+</head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    {% csrf_token %}
     <nav class="bg-indigo-600 dark:bg-indigo-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -38,16 +85,16 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <!-- Botão Dark Mode -->
-                    <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" 
+                    <button id="theme-toggle" 
                             class="p-2 text-white hover:text-gray-200 rounded-lg">
-                        <!-- Ícone Sol (Light Mode) -->
-                        <svg x-show="darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Ícone Sol -->
+                        <svg id="sun-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
                             </path>
                         </svg>
-                        <!-- Ícone Lua (Dark Mode) -->
-                        <svg x-show="!darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Ícone Lua -->
+                        <svg id="moon-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                   d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
                             </path>
@@ -88,10 +135,52 @@
             {% endfor %}
         {% endif %}
         
-        <div class="dark:text-white">
-            {% block content %}
-            {% endblock %}
-        </div>
+        {% block content %}
+        {% endblock %}
     </main>
+
+    <script>
+        // Inicialização do tema
+        document.addEventListener('DOMContentLoaded', function() {
+            const userThemePreference = document.documentElement.getAttribute('data-theme');
+            const darkMode = localStorage.getItem('darkMode') === 'true' || userThemePreference === 'dark';
+            
+            document.documentElement.classList.toggle('dark', darkMode);
+            updateThemeIcons(darkMode);
+        });
+
+        // Função para atualizar os ícones do tema
+        function updateThemeIcons(isDark) {
+            document.getElementById('sun-icon').classList.toggle('hidden', !isDark);
+            document.getElementById('moon-icon').classList.toggle('hidden', isDark);
+        }
+
+        // Função para alternar o tema
+        document.getElementById('theme-toggle').addEventListener('click', async function() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            updateThemeIcons(isDark);
+            localStorage.setItem('darkMode', isDark);
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const isAuthenticated = document.documentElement.hasAttribute('data-user');
+
+            if (isAuthenticated) {
+                try {
+                    await fetch('/users/update-theme/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: `theme=${isDark ? 'dark' : 'light'}`
+                    });
+                } catch (error) {
+                    console.error('Erro ao atualizar tema:', error);
+                }
+            }
+
+            window.dispatchEvent(new Event('themeChanged'));
+        });
+    </script>
 </body>
 </html> 

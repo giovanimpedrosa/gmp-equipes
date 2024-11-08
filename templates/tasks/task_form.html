@@ -14,7 +14,12 @@
                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {{ field.label }}
                     </label>
-                    {{ field.errors }}
+                    {% if field.errors %}
+                        <div class="text-red-600 dark:text-red-400 text-sm mb-2">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                    
                     {% if field.name == 'description' %}
                         <textarea name="{{ field.name }}" 
                                 id="{{ field.id_for_label }}"
@@ -22,14 +27,40 @@
                                        shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
                                        dark:bg-gray-700 dark:text-white"
                                 rows="4">{{ field.value|default:'' }}</textarea>
+                    
                     {% elif field.name == 'project' or field.name == 'priority' or field.name == 'status' %}
                         <select name="{{ field.name }}"
                                 id="{{ field.id_for_label }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 
                                        shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
                                        dark:bg-gray-700 dark:text-white">
-                            {{ field }}
+                            {% if field.name == 'project' %}
+                                <option value="">---------</option>
+                                {% for choice in field.field.queryset %}
+                                    <option value="{{ choice.pk }}" 
+                                            {% if field.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ choice.title }}
+                                    </option>
+                                {% endfor %}
+                            {% else %}
+                                {% for value, label in field.field.choices %}
+                                    <option value="{{ value }}" 
+                                            {% if field.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
                         </select>
+                    
+                    {% elif field.name == 'due_date' %}
+                        <input type="datetime-local" 
+                               name="{{ field.name }}"
+                               id="{{ field.id_for_label }}"
+                               value="{{ field.value|date:'Y-m-d\TH:i' }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 
+                                      shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
+                                      dark:bg-gray-700 dark:text-white">
+                    
                     {% else %}
                         <input type="{{ field.field.widget.input_type }}" 
                                name="{{ field.name }}"
@@ -39,11 +70,13 @@
                                       shadow-sm focus:border-indigo-500 focus:ring-indigo-500 
                                       dark:bg-gray-700 dark:text-white">
                     {% endif %}
+                    
                     {% if field.help_text %}
                         <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
                     {% endif %}
                 </div>
             {% endfor %}
+            
             <div class="flex justify-end space-x-2 mt-6">
                 <button type="submit" 
                         class="px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md 

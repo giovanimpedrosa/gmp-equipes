@@ -4,8 +4,9 @@
 
 {% block content %}
 <div class="mb-6 flex justify-between items-center">
-    <h2 class="text-2xl font-bold text-gray-900">Meus Projetos</h2>
-    <a href="{% url 'projects:create' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Meus Projetos</h2>
+    <a href="{% url 'projects:create' %}" 
+       class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-600">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -13,37 +14,5 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    {% if projects %}
-        {% for project in projects %}
-            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900">{{ project.title }}</h3>
-                    <p class="mt-2 text-gray-600">{{ project.description|truncatewords:30 }}</p>
-                    <p class="mt-4 text-sm text-gray-500">
-                        Criado em: {{ project.created_at|date:"d/m/Y" }}
-                    </p>
-                </div>
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-lg">
-                    <div class="flex justify-end space-x-2">
-                        <a href="{% url 'projects:detail' project.pk %}" 
-                           class="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800">
-                            Ver Detalhes
-                        </a>
-                        <a href="{% url 'projects:update' project.pk %}" 
-                           class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800">
-                            Editar
-                        </a>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="col-span-3">
-            <div class="bg-blue-50 text-blue-700 p-4 rounded-md">
-                Você ainda não tem projetos. <a href="{% url 'projects:create' %}" class="text-blue-800 hover:underline">Crie seu primeiro projeto</a>!
-            </div>
-        </div>
-    {% endif %}
-</div>
+{% include "components/datatable.html" %}
 {% endblock %} 

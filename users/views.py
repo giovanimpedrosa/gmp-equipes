@@ -3,6 +3,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
+from django.http import JsonResponse
 from .forms import CustomUserCreationForm
 from projects.models import Project
 from tasks.models import Task
@@ -60,4 +61,14 @@ def dashboard(request):
         'recent_projects': recent_projects,
     }
     
-    return render(request, 'users/dashboard.html', context) 
+    return render(request, 'users/dashboard.html', context)
+
+@login_required
+def update_theme(request):
+    if request.method == 'POST':
+        theme = request.POST.get('theme')
+        if theme in ['light', 'dark']:
+            request.user.theme_preference = theme
+            request.user.save()
+            return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
