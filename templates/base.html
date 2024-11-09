@@ -112,72 +112,151 @@
                    border-t border-gray-200 dark:border-gray-500 
                    rounded-b-lg flex justify-end space-x-2;
         }
+
+        /* Adicione estes estilos para a transição da sidebar */
+        @media (max-width: 768px) {
+            .sidebar-open {
+                transform: translateX(0);
+            }
+            
+            .sidebar-closed {
+                transform: translateX(-100%);
+            }
+            
+            .content-shifted {
+                margin-left: 0;
+            }
+        }
+
+        .sidebar-transition {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .content-transition {
+            transition: margin-left 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     {% csrf_token %}
     <nav class="fixed top-0 left-0 right-0 bg-indigo-600 dark:bg-indigo-800 z-50 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="{% url 'users:dashboard' %}" class="text-white font-bold text-xl">
-                        Gerenciador de Tarefas
-                    </a>
+        <div class="flex">
+            <!-- Área do brasão e título -->
+            <div class="w-64 flex items-center px-4 py-2 border-r border-indigo-500 dark:border-indigo-700">
+                <img src="/media/brasao_bh_grayscale.png" alt="Brasão" class="h-10 w-auto mr-3">
+                <div class="text-white text-sm leading-tight">
+                    <div>Município de</div>
+                    <div class="font-semibold">Cabo Frio / RJ</div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <!-- Botão Dark Mode -->
-                    <button id="theme-toggle" 
-                            class="p-2 text-white hover:text-gray-200 rounded-lg">
-                        <!-- Ícone Sol -->
-                        <svg id="sun-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
-                            </path>
-                        </svg>
-                        <!-- Ícone Lua -->
-                        <svg id="moon-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
-                            </path>
-                        </svg>
-                    </button>
+            </div>
 
-                    {% if user.is_authenticated %}
+            <!-- Resto da navbar -->
+            <div class="flex-1">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex items-center justify-between h-16">
                         <div class="flex items-center space-x-4">
-                            <a href="{% url 'users:dashboard' %}" class="text-white hover:text-gray-200">
-                                Dashboard
-                            </a>
-                            <span class="text-white">Olá, {{ user.username }}</span>
-                            <a href="{% url 'logout' %}" class="text-white hover:text-gray-200">
-                                Sair
-                            </a>
+                            <!-- Botão do menu alinhado com o conteúdo -->
+                            <button id="sidebar-toggle" 
+                                    class="p-2 text-white hover:text-gray-200 rounded-lg focus:outline-none">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
+                            <div class="flex items-center space-x-3">
+                                <img src="/media/logow.png" alt="Logo GMP" class="h-8 w-auto">
+                                <div class="flex flex-col">
+                                    <span class="text-white font-bold text-lg">GMP</span>
+                                    <span class="text-gray-300 text-sm">Gerenciador de Tarefas</span>
+                                </div>
+                            </div>
                         </div>
-                    {% else %}
                         <div class="flex items-center space-x-4">
-                            <a href="{% url 'login' %}" class="text-white hover:text-gray-200">
-                                Entrar
-                            </a>
-                            <a href="{% url 'users:register' %}" class="text-white hover:text-gray-200">
-                                Registrar
-                            </a>
+                            <!-- Botão Dark Mode -->
+                            <button id="theme-toggle" 
+                                    class="p-2 text-white hover:text-gray-200 rounded-lg">
+                                <!-- Ícone Sol -->
+                                <svg id="sun-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                                    </path>
+                                </svg>
+                                <!-- Ícone Lua -->
+                                <svg id="moon-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                                    </path>
+                                </svg>
+                            </button>
+
+                            {% if user.is_authenticated %}
+                                <div class="flex items-center space-x-4">
+                                    <a href="{% url 'users:dashboard' %}" class="text-white hover:text-gray-200">
+                                        Dashboard
+                                    </a>
+                                    <span class="text-white">Olá, {{ user.username }}</span>
+                                    <a href="{% url 'logout' %}" class="text-white hover:text-gray-200">
+                                        Sair
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="flex items-center space-x-4">
+                                    <a href="{% url 'login' %}" class="text-white hover:text-gray-200">
+                                        Entrar
+                                    </a>
+                                    <a href="{% url 'users:register' %}" class="text-white hover:text-gray-200">
+                                        Registrar
+                                    </a>
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 mt-16">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-4 p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200{% elif message.tags == 'error' %}bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200{% else %}bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-        {% block content %}
-        {% endblock %}
+    <!-- Sidebar com classes para responsividade -->
+    <aside id="sidebar" class="fixed left-0 top-16 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-40 transform transition-transform duration-300">
+        <div class="flex flex-col h-full">
+            <div class="flex-1 py-6 px-4">
+                <nav class="space-y-2">
+                    <a href="{% url 'projects:list' %}" 
+                       class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md group">
+                        <svg class="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                        </svg>
+                        <span class="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Projetos</span>
+                    </a>
+                    <a href="{% url 'tasks:list' %}" 
+                       class="flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md group">
+                        <svg class="w-5 h-5 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        <span class="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Tarefas</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Conteúdo principal com classe para transição -->
+    <main id="main-content" class="md:ml-64 ml-0 pt-16 transition-all duration-300">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200{% elif message.tags == 'error' %}bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200{% else %}bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </div>
     </main>
 
     <script>
@@ -221,6 +300,57 @@
             }
 
             window.dispatchEvent(new Event('themeChanged'));
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            let isSidebarOpen = true;
+            
+            function toggleSidebar() {
+                isSidebarOpen = !isSidebarOpen;
+                
+                if (!isSidebarOpen) {
+                    // Recolhe a sidebar
+                    sidebar.style.transform = 'translateX(-100%)';
+                    mainContent.classList.remove('md:ml-64');
+                    mainContent.classList.add('ml-0');
+                } else {
+                    // Expande a sidebar
+                    sidebar.style.transform = 'translateX(0)';
+                    mainContent.classList.add('md:ml-64');
+                    mainContent.classList.remove('ml-0');
+                }
+            }
+            
+            // Toggle no clique do botão
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            
+            // Fecha a sidebar quando clicar fora em dispositivos móveis
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth < 768 && isSidebarOpen && 
+                    !sidebar.contains(event.target) && 
+                    !sidebarToggle.contains(event.target)) {
+                    toggleSidebar();
+                }
+            });
+            
+            // Ajusta a sidebar quando redimensionar a tela
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 768) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    mainContent.classList.remove('md:ml-64');
+                    mainContent.classList.add('ml-0');
+                    isSidebarOpen = false;
+                } else {
+                    if (isSidebarOpen) {
+                        sidebar.style.transform = 'translateX(0)';
+                        mainContent.classList.add('md:ml-64');
+                        mainContent.classList.remove('ml-0');
+                    }
+                }
+            });
         });
     </script>
 </body>
