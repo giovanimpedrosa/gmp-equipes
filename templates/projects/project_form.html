@@ -1,121 +1,101 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ action }} Projeto{% endblock %}
-
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Projeto</h2>
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
-        <form method="post" enctype="multipart/form-data" class="flex flex-col h-full">
+<div class="max-w-4xl mx-auto p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            {% if form.instance.pk %}Editar{% else %}Novo{% endif %} Projeto
+        </h2>
+
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="p-6 flex-grow">
-                {% for field in form %}
-                    <div class="mb-4">
-                        <label for="{{ field.id_for_label }}" 
-                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {{ field.label }}
-                        </label>
+            {{ form.media }}
 
-                        {% if field.name == 'photo' %}
-                            <div class="mt-1 flex items-center">
-                                {% if project.photo %}
-                                    <div class="mb-3">
-                                        <img src="{{ project.photo.url }}" 
-                                             alt="Foto atual" 
-                                             class="w-32 h-32 object-cover rounded-lg">
-                                    </div>
-                                {% endif %}
-                                <input type="file" 
-                                       name="{{ field.name }}"
-                                       id="{{ field.id_for_label }}"
-                                       accept="image/*"
-                                       class="block w-full text-sm text-gray-900 dark:text-white
-                                              file:mr-4 file:py-2 file:px-4
-                                              file:rounded-md file:border-0
-                                              file:text-sm file:font-medium
-                                              file:bg-indigo-50 file:text-indigo-700
-                                              dark:file:bg-indigo-900 dark:file:text-indigo-300
-                                              hover:file:bg-indigo-100 dark:hover:file:bg-indigo-800
-                                              transition-colors duration-200
-                                              {% if field.errors %}border-2 border-red-500{% endif %}">
-                            </div>
-                        {% elif field.name == 'description' %}
-                            <textarea name="{{ field.name }}" 
-                                    id="{{ field.id_for_label }}"
-                                    rows="4"
-                                    class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
-                                           {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
-                                           focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
-                                           focus:border-none focus:ring-0
-                                           transition-colors duration-200
-                                           px-4 py-3">{{ field.value|default:'' }}</textarea>
-                        {% elif field.name == 'value' %}
-                            <input type="number" 
-                                   name="{{ field.name }}"
-                                   id="{{ field.id_for_label }}"
-                                   value="{{ field.value|default:'' }}"
-                                   step="0.01"
-                                   class="w-1/4 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
-                                          {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
-                                          focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
-                                          focus:border-none focus:ring-0
-                                          transition-colors duration-200
-                                          px-4 py-3">
-                        {% elif field.name == 'is_active' %}
-                            <div class="relative w-1/4">
-                                <label class="inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" 
-                                           name="{{ field.name }}"
-                                           id="{{ field.id_for_label }}"
-                                           {% if field.value %}checked{% endif %}
-                                           class="sr-only peer">
-                                    <div class="relative w-11 h-6 bg-gray-300 dark:bg-gray-600 
-                                                peer-focus:outline-none rounded-full peer 
-                                                peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
-                                                peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] 
-                                                after:start-[2px] after:bg-white after:border-gray-300 after:border 
-                                                after:rounded-full after:h-5 after:w-5 after:transition-all 
-                                                peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-500
-                                                {% if field.errors %}border-2 border-red-500{% endif %}"></div>
-                                    <span class="ms-3 text-gray-800 dark:text-gray-100">Ativo</span>
-                                </label>
-                            </div>
-                        {% else %}
-                            <input type="{{ field.field.widget.input_type }}" 
-                                   name="{{ field.name }}"
-                                   id="{{ field.id_for_label }}"
-                                   value="{{ field.value|default:'' }}"
-                                   class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
-                                          {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
-                                          focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
-                                          focus:border-none focus:ring-0
-                                          transition-colors duration-200
-                                          px-4 py-3">
-                        {% endif %}
-
-                        {% if field.errors %}
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
-                                {{ field.errors|join:", " }}
-                            </p>
-                        {% endif %}
-
-                        {% if field.help_text %}
-                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
-                        {% endif %}
+            {% for field in form %}
+            <div class="mb-6">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ field.label }}
+                </label>
+                
+                {% if field.name == 'detailed_description' %}
+                    <div class="prose dark:prose-invert max-w-none {% if field.errors %}border-2 border-red-500 dark:border-red-500 rounded-lg{% endif %}">
+                        {{ field }}
                     </div>
-                {% endfor %}
-            </div>
-            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
-                <div class="flex justify-end space-x-2">
-                    <button type="submit" 
-                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                        {{ action }}
-                    </button>
-                    <a href="{% url 'projects:list' %}" 
-                       class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
-                        Cancelar
-                    </a>
+                {% elif field.name == 'description' %}
+                    <textarea name="{{ field.name }}"
+                              id="{{ field.id_for_label }}"
+                              class="mt-1 block w-full rounded-md p-2.5
+                                     border border-gray-300 dark:border-gray-600
+                                     bg-gray-50 dark:bg-gray-700
+                                     {% if field.errors %}
+                                         border-2 border-red-500 dark:border-red-500
+                                     {% endif %}
+                                     focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none
+                                     dark:text-white sm:text-sm"
+                              rows="4">{{ field.value|default:'' }}</textarea>
+                {% elif field.name == 'photo' %}
+                    <div class="space-y-2">
+                        {% if form.instance.photo %}
+                            <div class="mb-2">
+                                <img src="{{ form.instance.photo.url }}" alt="Foto atual" class="max-w-xs rounded-lg">
+                            </div>
+                        {% endif %}
+                        <input type="file"
+                               name="{{ field.name }}"
+                               id="{{ field.id_for_label }}"
+                               class="block w-full text-sm rounded-lg cursor-pointer p-2.5
+                                      border border-gray-300 dark:border-gray-600
+                                      bg-gray-50 dark:bg-gray-700
+                                      {% if field.errors %}
+                                          border-2 border-red-500 dark:border-red-500
+                                      {% endif %}
+                                      focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none
+                                      text-gray-900 dark:text-gray-400
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-indigo-50 file:text-indigo-700
+                                      dark:file:bg-indigo-900 dark:file:text-indigo-300
+                                      hover:file:bg-indigo-100 dark:hover:file:bg-indigo-800">
+                    </div>
+                {% else %}
+                    <input type="{{ field.field.widget.input_type|default:'text' }}"
+                           name="{{ field.name }}"
+                           id="{{ field.id_for_label }}"
+                           value="{{ field.value|default:'' }}"
+                           {% if field.name == 'value' %}step="0.01"{% endif %}
+                           class="mt-1 block w-full rounded-md p-2.5
+                                  border border-gray-300 dark:border-gray-600
+                                  bg-gray-50 dark:bg-gray-700
+                                  {% if field.errors %}
+                                      border-2 border-red-500 dark:border-red-500
+                                  {% endif %}
+                                  focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none
+                                  dark:text-white sm:text-sm"
+                           {% if field.field.widget.input_type == 'number' %}[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none{% endif %}>
+                {% endif %}
+
+                {% if field.errors %}
+                <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                    {{ field.errors }}
                 </div>
+                {% endif %}
+
+                {% if field.help_text %}
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="flex items-center justify-end space-x-4 border-t border-gray-200 dark:border-gray-700 -mx-6 -mb-6 px-6 py-4 mt-6 bg-gray-50 dark:bg-gray-700/50">
+                <button type="submit" 
+                        class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                    Editar
+                </button>
+                <a href="{% url 'projects:list' %}" 
+                   class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    Cancelar
+                </a>
             </div>
         </form>
     </div>

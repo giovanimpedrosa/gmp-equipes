@@ -1,0 +1,114 @@
+/* Tema claro */
+.ck.ck-editor {
+    --ck-color-base-background: #F9FAFB;  /* bg-gray-50 */
+    --ck-color-base-text: #374151;        /* text-gray-700 */
+    --ck-color-toolbar-background: #F9FAFB;  /* bg-gray-50 */
+    --ck-color-toolbar-border: #E5E7EB;   /* border-gray-300 */
+    --ck-border-radius: 0.375rem;         /* rounded-md */
+    --ck-color-focus-border: #6366F1;     /* border-indigo-500 */
+    --ck-color-button-default-hover-background: #F3F4F6;  /* bg-gray-100 */
+    --ck-color-button-on-background: #EEF2FF;  /* indigo-50 */
+    --ck-color-button-on-hover-background: #E0E7FF;  /* indigo-100 */
+    --ck-color-dropdown-panel-background: #FFFFFF;  /* white */
+    --ck-color-list-button-hover-background: #F3F4F6;  /* bg-gray-100 */
+}
+
+/* Tema escuro */
+[data-theme='dark'] .ck.ck-editor {
+    --ck-color-base-background: #374151;  /* bg-gray-700 */
+    --ck-color-base-text: #F3F4F6;       /* text-gray-100 */
+    --ck-color-toolbar-background: #374151;  /* bg-gray-700 */
+    --ck-color-toolbar-border: #4B5563;    /* border-gray-600 */
+    --ck-color-button-default-hover-background: #4B5563;  /* bg-gray-600 */
+    --ck-color-button-on-background: #312E81;  /* indigo-900 */
+    --ck-color-button-on-hover-background: #3730A3;  /* indigo-800 */
+    --ck-color-dropdown-panel-background: #1F2937;  /* bg-gray-800 */
+    --ck-color-list-button-hover-background: #374151;  /* bg-gray-700 */
+}
+
+/* Container do editor */
+.ck.ck-editor__main {
+    border-radius: 0.375rem;
+}
+
+/* Área editável */
+.ck.ck-editor__main>.ck-editor__editable {
+    background-color: var(--ck-color-base-background) !important;
+    color: var(--ck-color-base-text) !important;
+    border: 1px solid var(--ck-color-toolbar-border) !important;
+    min-height: 200px;
+    padding: 0.625rem !important;
+    border-bottom-left-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
+}
+
+/* Estado focado */
+.ck.ck-editor__main>.ck-editor__editable.ck-focused {
+    border: 2px solid var(--ck-color-focus-border) !important;
+    box-shadow: none !important;
+}
+
+/* Barra de ferramentas */
+.ck.ck-toolbar {
+    background-color: var(--ck-color-toolbar-background) !important;
+    border: 1px solid var(--ck-color-toolbar-border) !important;
+    border-bottom: none !important;
+    border-top-left-radius: 0.375rem !important;
+    border-top-right-radius: 0.375rem !important;
+    padding: 0.25rem !important;
+}
+
+/* Botões da barra de ferramentas */
+.ck.ck-toolbar .ck-button {
+    color: var(--ck-color-base-text) !important;
+    border-radius: 0.25rem !important;
+    padding: 0.375rem 0.5rem !important;
+    margin: 0 0.125rem !important;
+}
+
+.ck.ck-toolbar .ck-button:hover {
+    background: var(--ck-color-button-default-hover-background) !important;
+}
+
+.ck.ck-toolbar .ck-button.ck-on {
+    background: var(--ck-color-button-on-background) !important;
+}
+
+.ck.ck-toolbar .ck-button.ck-on:hover {
+    background: var(--ck-color-button-on-hover-background) !important;
+}
+
+/* Dropdowns e Painéis */
+.ck.ck-dropdown__panel,
+.ck.ck-list {
+    background: var(--ck-color-dropdown-panel-background) !important;
+    border-color: var(--ck-color-toolbar-border) !important;
+}
+
+.ck.ck-list__item .ck-button:hover {
+    background: var(--ck-color-list-button-hover-background) !important;
+}
+
+/* Remove sombras e outlines indesejados */
+.ck.ck-editor__main>.ck-editor__editable:not(.ck-focused),
+.ck.ck-toolbar,
+.ck.ck-toolbar *,
+.ck.ck-dropdown__panel,
+.ck.ck-list {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Estado de erro */
+.prose.border-red-500 .ck.ck-editor__main>.ck-editor__editable {
+    border: 2px solid #EF4444 !important;  /* red-500 */
+}
+
+/* Ajustes para links e outros elementos dentro do editor */
+.ck.ck-editor__main>.ck-editor__editable a {
+    color: #6366F1 !important;  /* indigo-500 */
+}
+
+[data-theme='dark'] .ck.ck-editor__main>.ck-editor__editable a {
+    color: #818CF8 !important;  /* indigo-400 */
+}
