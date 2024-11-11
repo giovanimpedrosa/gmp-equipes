@@ -1,89 +1,147 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ action }} Tarefa{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto p-6">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            {% if form.instance.pk %}Editar{% else %}Nova{% endif %} Tarefa
-        </h2>
-
-        <form method="post">
+<div class="max-w-3xl mx-auto">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Tarefa</h2>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
+        <form method="post" class="flex flex-col h-full">
             {% csrf_token %}
+            <div class="p-6 flex-grow">
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" 
+                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {{ field.label }}
+                        </label>
+                        {% if field.errors %}
+                            <div class="text-red-600 dark:text-red-400 text-sm mb-2">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
 
-            {% for field in form %}
-            <div class="mb-6">
-                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {{ field.label }}
-                </label>
+                        {% if field.name == 'project' %}
+                            <div class="flex items-end gap-2">
+                                <div class="flex-1">
+                                    <select name="{{ field.name }}"
+                                            id="{{ field.id_for_label }}"
+                                            class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                                   {% if field.errors %}border-2 border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %}
+                                                   focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                                   focus:border-none focus:ring-0
+                                                   transition-colors duration-200
+                                                   px-4 py-3">
+                                        <option value="">---------</option>
+                                        {% for choice in field.field.queryset %}
+                                            <option value="{{ choice.pk }}" {% if field.value|stringformat:"s" == choice.pk|stringformat:"s" %}selected{% endif %}>
+                                                {{ choice.title }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="button"
+                                        onclick="window.open('{% url 'projects:create' %}?popup=true', 'NovoProjeto', 'width=800,height=600')"
+                                        class="px-3 py-3 border border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-500 rounded-md 
+                                               hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white dark:hover:text-white 
+                                               transition-colors duration-200">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                </button>
+                                <button type="button"
+                                        onclick="viewProject()"
+                                        class="px-3 py-3 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-md 
+                                               hover:bg-gray-100 dark:hover:bg-gray-700
+                                               transition-colors duration-200"
+                                        id="viewProjectBtn"
+                                        {% if not field.value %}disabled{% endif %}>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        {% elif field.name == 'status' %}
+                            <select name="{{ field.name }}"
+                                    id="{{ field.id_for_label }}"
+                                    class="w-1/4 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                           border border-gray-300 dark:border-gray-600 
+                                           focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                           focus:border-none focus:ring-0
+                                           transition-colors duration-200
+                                           px-4 py-3">
+                                <option value="todo" {% if field.value == 'todo' %}selected{% endif %}>A Fazer</option>
+                                <option value="doing" {% if field.value == 'doing' %}selected{% endif %}>Em Andamento</option>
+                                <option value="done" {% if field.value == 'done' %}selected{% endif %}>Concluída</option>
+                            </select>
+                        {% elif field.name == 'priority' %}
+                            <select name="{{ field.name }}"
+                                    id="{{ field.id_for_label }}"
+                                    class="w-1/4 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                           border border-gray-300 dark:border-gray-600 
+                                           focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                           focus:border-none focus:ring-0
+                                           transition-colors duration-200
+                                           px-4 py-3">
+                                <option value="low" {% if field.value == 'low' %}selected{% endif %}>Baixa</option>
+                                <option value="medium" {% if field.value == 'medium' %}selected{% endif %}>Média</option>
+                                <option value="high" {% if field.value == 'high' %}selected{% endif %}>Alta</option>
+                            </select>
+                        {% else %}
+                            <input type="{{ field.field.widget.input_type }}" 
+                                   name="{{ field.name }}"
+                                   id="{{ field.id_for_label }}"
+                                   value="{{ field.value|default:'' }}"
+                                   class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                          border border-gray-300 dark:border-gray-600 
+                                          focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                          focus:border-none focus:ring-0
+                                          transition-colors duration-200
+                                          px-4 py-3">
+                        {% endif %}
 
-                {% if field.name == 'description' %}
-                    <textarea name="{{ field.name }}"
-                              id="{{ field.id_for_label }}"
-                              class="mt-1 block w-full rounded-md p-2.5
-                                     border border-gray-300 dark:border-gray-600
-                                     bg-gray-50 dark:bg-gray-700
-                                     {% if field.errors %}
-                                         border-2 border-red-500 dark:border-red-500
-                                     {% endif %}
-                                     focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none
-                                     dark:text-white sm:text-sm"
-                              rows="4">{{ field.value|default:'' }}</textarea>
-                {% elif field.name == 'project' or field.name == 'priority' or field.name == 'status' %}
-                    <select name="{{ field.name }}"
-                            id="{{ field.id_for_label }}"
-                            class="mt-1 block w-full rounded-md p-2.5
-                                   border border-gray-300 dark:border-gray-600
-                                   bg-gray-50 dark:bg-gray-700
-                                   {% if field.errors %}
-                                       border-2 border-red-500 dark:border-red-500
-                                   {% endif %}
-                                   focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none
-                                   dark:text-white sm:text-sm">
-                        {% for choice in field.field.choices %}
-                            <option value="{{ choice.0 }}" {% if field.value|stringformat:"s" == choice.0|stringformat:"s" %}selected{% endif %}>
-                                {{ choice.1 }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                {% else %}
-                    <input type="{{ field.field.widget.input_type|default:'text' }}"
-                           name="{{ field.name }}"
-                           id="{{ field.id_for_label }}"
-                           value="{{ field.value|default:'' }}"
-                           {% if field.name == 'due_date' %}step="any"{% endif %}
-                           class="mt-1 block w-full rounded-md p-2.5
-                                  border border-gray-300 dark:border-gray-600
-                                  bg-gray-50 dark:bg-gray-700
-                                  {% if field.errors %}
-                                      border-2 border-red-500 dark:border-red-500
-                                  {% endif %}
-                                  focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none
-                                  dark:text-white sm:text-sm">
-                {% endif %}
-
-                {% if field.errors %}
-                <div class="mt-2 text-sm text-red-600 dark:text-red-400">
-                    {{ field.errors }}
-                </div>
-                {% endif %}
-
-                {% if field.help_text %}
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
-                {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-
-            <div class="flex items-center justify-end space-x-4 border-t border-gray-200 dark:border-gray-700 -mx-6 -mb-6 px-6 py-4 mt-6 bg-gray-50 dark:bg-gray-700/50">
-                <button type="submit" 
-                        class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                    Editar
-                </button>
-                <a href="{% url 'tasks:list' %}" 
-                   class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                    Cancelar
-                </a>
+            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
+                <div class="flex justify-end space-x-2">
+                    <button type="submit" 
+                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                        {{ action }}
+                    </button>
+                    {% if task %}
+                        <a href="{% url 'tasks:detail' task.pk %}" 
+                           class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                            Cancelar
+                        </a>
+                    {% else %}
+                        <a href="{% url 'tasks:list' %}" 
+                           class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                            Cancelar
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+    // Atualiza o estado do botão de visualizar quando o select muda
+    document.getElementById('{{ form.project.id_for_label }}').addEventListener('change', function(e) {
+        const viewBtn = document.getElementById('viewProjectBtn');
+        viewBtn.disabled = !e.target.value;
+    });
+
+    function viewProject() {
+        const projectId = document.getElementById('{{ form.project.id_for_label }}').value;
+        if (projectId) {
+            window.open(`/projects/${projectId}/?popup=true`, 'VisualizarProjeto', 'width=800,height=600');
+        }
+    }
+</script>
 {% endblock %} 

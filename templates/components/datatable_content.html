@@ -116,11 +116,9 @@
             </div>
         </div>
     {% else %}
-        <!-- Visualização em Grid (Cards) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 p-4 auto-rows-fr">
             {% for item in items %}
                 <div class="datatable-item bg-white dark:bg-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col h-full">
-                    <!-- Imagem do Card -->
                     {% if view_name == 'projects' %}
                         {% if item.photo %}
                             <img src="{{ item.photo.url }}" alt="Foto do projeto" class="h-48 w-full object-cover rounded-t-lg">
@@ -132,7 +130,6 @@
                             </div>
                         {% endif %}
                     {% endif %}
-                    <!-- Conteúdo do Card -->
                     <div class="p-4 flex-grow">
                         {% for column in columns %}
                             <div class="mb-2">
@@ -175,8 +172,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    <!-- Ações do Card -->
-                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
+                    <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg mt-auto">
                         <div class="flex justify-end space-x-2">
                             <a href="{% url view_name|add:':detail' item.pk %}" 
                                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
@@ -208,27 +204,44 @@
 <!-- Paginação -->
 {% if items.has_other_pages %}
     <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-        <nav class="flex items-center justify-between">
-            <div class="flex-1 flex justify-between">
+        <div class="flex items-center justify-between">
+            <!-- Botões de navegação -->
+            <div class="flex items-center space-x-4">
                 {% if items.has_previous %}
-                    <button hx-get="{{ request.path }}?page={{ items.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                    <button hx-get="{{ request.path }}?page={{ items.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.direction %}&direction={{ request.GET.direction }}{% endif %}&view={{ view_type }}"
                             hx-target=".datatable-content"
                             class="px-3 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                         Anterior
                     </button>
                 {% endif %}
                 
+                <!-- Informações de paginação -->
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                    Página <span class="font-medium">{{ items.number }}</span> de <span class="font-medium">{{ items.paginator.num_pages }}</span>
+                    <span class="mx-2">•</span>
+                    Total de <span class="font-medium">{{ items.paginator.count }}</span> registros
+                </span>
+
                 {% if items.has_next %}
-                    <button hx-get="{{ request.path }}?page={{ items.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                    <button hx-get="{{ request.path }}?page={{ items.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.direction %}&direction={{ request.GET.direction }}{% endif %}&view={{ view_type }}"
                             hx-target=".datatable-content"
                             class="px-3 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                         Próximo
                     </button>
                 {% endif %}
             </div>
-        </nav>
+        </div>
     </div>
-{% endif %} 
+{% else %}
+    <!-- Quando há apenas uma página, mostra apenas o total de registros -->
+    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-end">
+            <span class="text-sm text-gray-700 dark:text-gray-300">
+                Total de <span class="font-medium">{{ items.paginator.count }}</span> registros
+            </span>
+        </div>
+    </div>
+{% endif %}
 
 <style>
     /* Estilo para Firefox */
