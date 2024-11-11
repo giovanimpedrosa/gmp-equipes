@@ -9,14 +9,9 @@
       method="post"
       enctype="multipart/form-data"
       class="flex flex-col h-full"
-      {%
-      if
-      request.GET.popup
-      %}
+      {% if request.GET.popup %}
       onsubmit="return handleSubmit(event)"
-      {%
-      endif
-      %}
+      {% endif %}
     >
       {% csrf_token %}
       <div class="p-6 flex-grow">
