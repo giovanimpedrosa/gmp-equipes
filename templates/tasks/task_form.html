@@ -131,13 +131,28 @@
                             class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                         {{ action }}
                     </button>
-                    <button type="button" 
-                            class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                    <a href="{% if task %}{% url 'tasks:detail' task.pk %}{% else %}{% url 'tasks:list' %}{% endif %}" 
+                       class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
                         Cancelar
-                    </button>
+                    </a>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+function viewProject() {
+    const projectId = document.getElementById('{{ form.project.id_for_label }}').value;
+    if (projectId) {
+        window.open(`/projects/${projectId}/?popup=true`, 'VisualizarProjeto', 'width=800,height=600');
+    }
+}
+
+// Atualiza o estado do botão de visualizar quando o select muda
+document.getElementById('{{ form.project.id_for_label }}').addEventListener('change', function(e) {
+    const viewBtn = document.getElementById('viewProjectBtn');
+    viewBtn.disabled = !e.target.value;
+});
+</script>
 {% endblock %} 

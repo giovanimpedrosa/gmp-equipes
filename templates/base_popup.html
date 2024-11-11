@@ -20,6 +20,14 @@
                 }
             }
         }
+
+        // Sincroniza o tema com a janela principal
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.opener) {
+                const isDark = window.opener.document.documentElement.classList.contains('dark');
+                document.documentElement.classList.toggle('dark', isDark);
+            }
+        });
     </script>
     <style>
         input[type="text"],
@@ -52,12 +60,12 @@
         }
     </style>
 </head>
-<body class="h-full w-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+<body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     {% csrf_token %}
-    <div class="w-full p-6">
+    <main class="p-6">
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 
     <script>
         // Adiciona o comportamento de fechar a janela aos botões quando em popup

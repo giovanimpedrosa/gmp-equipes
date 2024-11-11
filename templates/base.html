@@ -545,58 +545,73 @@
           window.dispatchEvent(new Event("themeChanged"));
         });
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const sidebar = document.getElementById("sidebar");
-        const mainContent = document.getElementById("main-content");
-        const sidebarToggle = document.getElementById("sidebar-toggle");
-        let isSidebarOpen = true;
+      document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.ml-64');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        
+        if (sidebar && mainContent && sidebarToggle) {
+            let isSidebarOpen = true;
 
-        function toggleSidebar() {
-          isSidebarOpen = !isSidebarOpen;
+            function toggleSidebar() {
+                isSidebarOpen = !isSidebarOpen;
+                const isMobile = window.innerWidth < 768;
 
-          if (!isSidebarOpen) {
-            // Recolhe a sidebar
-            sidebar.style.transform = "translateX(-100%)";
-            mainContent.classList.remove("md:ml-64");
-            mainContent.classList.add("ml-0");
-          } else {
-            // Expande a sidebar
-            sidebar.style.transform = "translateX(0)";
-            mainContent.classList.add("md:ml-64");
-            mainContent.classList.remove("ml-0");
-          }
-        }
-
-        // Toggle no clique do botão
-        sidebarToggle.addEventListener("click", toggleSidebar);
-
-        // Fecha a sidebar quando clicar fora em dispositivos móveis
-        document.addEventListener("click", function (event) {
-          if (
-            window.innerWidth < 768 &&
-            isSidebarOpen &&
-            !sidebar.contains(event.target) &&
-            !sidebarToggle.contains(event.target)
-          ) {
-            toggleSidebar();
-          }
-        });
-
-        // Ajusta a sidebar quando redimensionar a tela
-        window.addEventListener("resize", function () {
-          if (window.innerWidth < 768) {
-            sidebar.style.transform = "translateX(-100%)";
-            mainContent.classList.remove("md:ml-64");
-            mainContent.classList.add("ml-0");
-            isSidebarOpen = false;
-          } else {
-            if (isSidebarOpen) {
-              sidebar.style.transform = "translateX(0)";
-              mainContent.classList.add("md:ml-64");
-              mainContent.classList.remove("ml-0");
+                if (!isSidebarOpen) {
+                    // Recolhe a sidebar
+                    sidebar.style.transform = 'translateX(-100%)';
+                    if (!isMobile) {
+                        mainContent.classList.remove('ml-64');
+                        mainContent.classList.add('ml-0');
+                    }
+                } else {
+                    // Expande a sidebar
+                    sidebar.style.transform = 'translateX(0)';
+                    if (!isMobile) {
+                        mainContent.classList.remove('ml-0');
+                        mainContent.classList.add('ml-64');
+                    }
+                }
             }
-          }
-        });
+
+            // Toggle no clique do botão
+            sidebarToggle.addEventListener('click', toggleSidebar);
+
+            // Fecha a sidebar quando clicar fora em dispositivos móveis
+            document.addEventListener('click', function(event) {
+                const isMobile = window.innerWidth < 768;
+                if (isMobile && isSidebarOpen && !sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                    toggleSidebar();
+                }
+            });
+
+            // Ajusta a sidebar quando redimensionar a tela
+            window.addEventListener('resize', function() {
+                const isMobile = window.innerWidth < 768;
+                
+                if (isMobile) {
+                    mainContent.classList.remove('ml-64', 'ml-0');
+                    if (isSidebarOpen) {
+                        toggleSidebar();
+                    }
+                } else {
+                    if (isSidebarOpen) {
+                        mainContent.classList.add('ml-64');
+                        mainContent.classList.remove('ml-0');
+                    } else {
+                        mainContent.classList.add('ml-0');
+                        mainContent.classList.remove('ml-64');
+                    }
+                }
+            });
+
+            // Configuração inicial baseada no tamanho da tela
+            if (window.innerWidth < 768) {
+                mainContent.classList.remove('ml-64', 'ml-0');
+                sidebar.style.transform = 'translateX(-100%)';
+                isSidebarOpen = false;
+            }
+        }
       });
 
       // Controle do painel de notificações
