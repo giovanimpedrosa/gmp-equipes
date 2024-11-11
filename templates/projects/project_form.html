@@ -8,6 +8,7 @@
       method="post"
       enctype="multipart/form-data"
       class="flex flex-col h-full"
+      {% if request.GET.popup %}onsubmit="return handleSubmit(event)"{% endif %}
     >
       {% csrf_token %}
       <div class="p-6 flex-grow">
@@ -19,11 +20,7 @@
           >
             {{ field.label }}
           </label>
-          {% if field.errors %}
-          <div class="text-red-600 dark:text-red-400 text-sm mb-2">
-            {{ field.errors }}
-          </div>
-          {% endif %} {% if field.name == 'photo' %}
+          {% if field.name == 'photo' %}
           <div class="flex items-center gap-4">
             {% if project.photo %}
               <img src="{{ project.photo.url }}" 
@@ -42,7 +39,8 @@
                      file:bg-indigo-50 file:text-indigo-700
                      dark:file:bg-indigo-900 dark:file:text-indigo-300
                      hover:file:bg-indigo-100 dark:hover:file:bg-indigo-800
-                     transition-colors duration-200"
+                     transition-colors duration-200
+                     {% if field.errors %}border-2 border-red-500 rounded-md{% endif %}"
             />
           </div>
           {% elif field.name == 'detailed_description' %}
@@ -59,8 +57,12 @@
                    focus:border-none focus:ring-0
                    transition-colors duration-200
                    px-4 py-3
-                   {% if field.errors %}border-2 border-red-500{% endif %}"
+                   {% if field.errors %}!border-2 !border-red-500{% endif %}"
           />
+          {% endif %} {% if field.errors %}
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+            {{ field.errors|join:", " }}
+          </p>
           {% endif %} {% if field.help_text %}
           <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
             {{ field.help_text }}
@@ -81,6 +83,7 @@
           </button>
           <button
             type="button"
+            onclick="window.close()"
             class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
           >
             Cancelar
@@ -92,4 +95,37 @@
 </div>
 
 {{ form.media }}
+{% if request.GET.popup %}
+<script>
+function handleSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Recarrega a página pai para atualizar o select de projetos
+            if (window.opener) {
+                window.opener.location.reload();
+            }
+            // Fecha o popup
+            window.close();
+        }
+        return response.text();
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
+
+    return false;
+}
+</script>
+{% endif %}
 {% endblock %}

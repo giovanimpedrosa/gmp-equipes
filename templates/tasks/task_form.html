@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends request.GET.popup|yesno:"base_popup.html,base.html" %}
 
 {% block title %}{{ action }} Tarefa{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
+<div class="{% if not request.GET.popup %}max-w-3xl mx-auto{% endif %}">
     <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Tarefa</h2>
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
         <form method="post" class="flex flex-col h-full">
@@ -15,11 +15,6 @@
                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             {{ field.label }}
                         </label>
-                        {% if field.errors %}
-                            <div class="text-red-600 dark:text-red-400 text-sm mb-2">
-                                {{ field.errors }}
-                            </div>
-                        {% endif %}
 
                         {% if field.name == 'project' %}
                             <div class="flex items-end gap-2">
@@ -62,6 +57,11 @@
                                     </svg>
                                 </button>
                             </div>
+                            {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                {{ field.errors|join:", " }}
+                            </p>
+                        {% endif %}                            
                         {% elif field.name == 'status' %}
                             <select name="{{ field.name }}"
                                     id="{{ field.id_for_label }}"
@@ -70,11 +70,17 @@
                                            focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
                                            focus:border-none focus:ring-0
                                            transition-colors duration-200
-                                           px-4 py-3">
+                                           px-4 py-3
+                                           {% if field.errors %}!border-2 !border-red-500{% endif %}">
                                 <option value="todo" {% if field.value == 'todo' %}selected{% endif %}>A Fazer</option>
                                 <option value="doing" {% if field.value == 'doing' %}selected{% endif %}>Em Andamento</option>
                                 <option value="done" {% if field.value == 'done' %}selected{% endif %}>Concluída</option>
                             </select>
+                            {% if field.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                    {{ field.errors|join:", " }}
+                                </p>
+                            {% endif %}
                         {% elif field.name == 'priority' %}
                             <select name="{{ field.name }}"
                                     id="{{ field.id_for_label }}"
@@ -83,11 +89,17 @@
                                            focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
                                            focus:border-none focus:ring-0
                                            transition-colors duration-200
-                                           px-4 py-3">
+                                           px-4 py-3
+                                           {% if field.errors %}!border-2 !border-red-500{% endif %}">
                                 <option value="low" {% if field.value == 'low' %}selected{% endif %}>Baixa</option>
                                 <option value="medium" {% if field.value == 'medium' %}selected{% endif %}>Média</option>
                                 <option value="high" {% if field.value == 'high' %}selected{% endif %}>Alta</option>
                             </select>
+                            {% if field.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                    {{ field.errors|join:", " }}
+                                </p>
+                            {% endif %}
                         {% else %}
                             <input type="{{ field.field.widget.input_type }}" 
                                    name="{{ field.name }}"
@@ -98,7 +110,13 @@
                                           focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
                                           focus:border-none focus:ring-0
                                           transition-colors duration-200
-                                          px-4 py-3">
+                                          px-4 py-3
+                                          {% if field.errors %}!border-2 !border-red-500{% endif %}">
+                            {% if field.errors %}
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                    {{ field.errors|join:", " }}
+                                </p>
+                            {% endif %}
                         {% endif %}
 
                         {% if field.help_text %}
@@ -113,35 +131,13 @@
                             class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                         {{ action }}
                     </button>
-                    {% if task %}
-                        <a href="{% url 'tasks:detail' task.pk %}" 
-                           class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
-                            Cancelar
-                        </a>
-                    {% else %}
-                        <a href="{% url 'tasks:list' %}" 
-                           class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
-                            Cancelar
-                        </a>
-                    {% endif %}
+                    <button type="button" 
+                            class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                        Cancelar
+                    </button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-    // Atualiza o estado do botão de visualizar quando o select muda
-    document.getElementById('{{ form.project.id_for_label }}').addEventListener('change', function(e) {
-        const viewBtn = document.getElementById('viewProjectBtn');
-        viewBtn.disabled = !e.target.value;
-    });
-
-    function viewProject() {
-        const projectId = document.getElementById('{{ form.project.id_for_label }}').value;
-        if (projectId) {
-            window.open(`/projects/${projectId}/?popup=true`, 'VisualizarProjeto', 'width=800,height=600');
-        }
-    }
-</script>
 {% endblock %} 
