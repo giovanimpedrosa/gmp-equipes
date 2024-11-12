@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.http import HttpResponse
+from django.views.generic import CreateView, UpdateView
+from django.urls import reverse_lazy
 from .models import Project
 from .forms import ProjectForm
 
@@ -49,18 +52,20 @@ def project_list(request):
         return render(request, 'components/datatable_content.html', context)
     return render(request, 'projects/project_list.html', context)
 
-@login_required
-def project_create(request):
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, request.FILES)
-        if form.is_valid():
-            project = form.save(commit=False)
-            project.owner = request.user
-            project.save()
-            return redirect('projects:detail', pk=project.pk)
-    else:
-        form = ProjectForm()
-    return render(request, 'projects/project_form.html', {'form': form, 'action': 'Criar'})
+class ProjectCreateView(LoginRequiredMixin, CreateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = 'projects/project_form.html'
+    success_url = reverse_lazy('projects:list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = 'Criar'
+        return context
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 @login_required
 def project_detail(request, pk):
@@ -71,21 +76,16 @@ def project_detail(request, pk):
         'tasks': tasks
     })
 
-@login_required
-def project_update(request, pk):
-    project = get_object_or_404(Project, pk=pk, owner=request.user)
-    if request.method == 'POST':
-        form = ProjectForm(request.POST, request.FILES, instance=project)
-        if form.is_valid():
-            form.save()
-            return redirect('projects:detail', pk=project.pk)
-    else:
-        form = ProjectForm(instance=project)
-    return render(request, 'projects/project_form.html', {
-        'form': form,
-        'project': project,
-        'action': 'Editar'
-    })
+class ProjectUpdateView(LoginRequiredMixin, UpdateView):
+    model = Project
+    form_class = ProjectForm
+    template_name = 'projects/project_form.html'
+    success_url = reverse_lazy('projects:list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['action'] = 'Atualizar'
+        return context
 
 @login_required
 def project_delete(request, pk):

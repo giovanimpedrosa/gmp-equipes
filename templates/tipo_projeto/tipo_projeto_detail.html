@@ -1,0 +1,37 @@
+{% extends request.GET.popup|yesno:"base_popup.html,base.html" %}
+
+{% block title %}Detalhes do Tipo de Projeto{% endblock %}
+
+{% block content %}
+<div class="{% if not request.GET.popup %}max-w-3xl mx-auto{% endif %}">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ object.descricao }}</h2>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Data de Criação</p>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-white">{{ object.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'tipo_projeto:update' object.pk %}" 
+                   class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                    Editar
+                </a>
+                <a href="{% url 'tipo_projeto:delete' object.pk %}" 
+                   class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300">
+                    Excluir
+                </a>
+                <a href="{% url 'tipo_projeto:list' %}" 
+                   class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                    Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

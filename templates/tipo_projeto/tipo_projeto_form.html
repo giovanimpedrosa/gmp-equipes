@@ -1,0 +1,55 @@
+{% extends request.GET.popup|yesno:"base_popup.html,base.html" %}
+
+{% block title %}{{ action }} Tipo de Projeto{% endblock %}
+
+{% block content %}
+<div class="{% if not request.GET.popup %}max-w-3xl mx-auto{% endif %}">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Tipo de Projeto</h2>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
+        <form method="post" class="flex flex-col h-full">
+            {% csrf_token %}
+            <div class="p-6 flex-grow">
+                {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" 
+                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {{ field.label }}
+                        </label>
+                        <input type="{{ field.field.widget.input_type }}" 
+                               name="{{ field.name }}"
+                               id="{{ field.id_for_label }}"
+                               value="{{ field.value|default:'' }}"
+                               class="w-full rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white
+                                      border border-gray-300 dark:border-gray-600 
+                                      focus:outline focus:outline-2 focus:outline-indigo-600 dark:focus:outline-indigo-500
+                                      focus:border-none focus:ring-0
+                                      transition-colors duration-200
+                                      px-4 py-3
+                                      {% if field.errors %}!border-2 !border-red-500{% endif %}">
+                        {% if field.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+                                {{ field.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                        {% if field.help_text %}
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ field.help_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="px-4 py-3 bg-gray-50 dark:bg-gray-600 border-t border-gray-200 dark:border-gray-500 rounded-b-lg">
+                <div class="flex justify-end space-x-2">
+                    <button type="submit" 
+                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                        {{ action }}
+                    </button>
+                    <a href="{% url 'tipo_projeto:list' %}" 
+                       class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,39 @@
+<div class="py-1">
+    {% for tipo in tipos %}
+    <div class="cursor-pointer p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 text-gray-900 dark:text-white"
+         onclick="selectTipoProjeto('{{ tipo.id }}', '{{ tipo.descricao|escapejs }}')">
+        {{ tipo.descricao }}
+    </div>
+    {% empty %}
+        {% if search %}
+        <div class="p-2 text-gray-600 dark:text-gray-300">
+            Nenhum resultado encontrado para "{{ search }}"
+        </div>
+        {% else %}
+        <div class="p-2 text-gray-600 dark:text-gray-300">
+            Nenhum tipo de projeto cadastrado
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+function selectTipoProjeto(id, descricao) {
+    const searchInput = document.getElementById('tipo-projeto-search');
+    const hiddenInput = document.getElementById('id_tipo_projeto');
+    const resultsDiv = document.getElementById('autocomplete-results');
+    const clearButton = document.getElementById('clear-tipo-projeto');
+    
+    // Atualiza os valores
+    searchInput.value = descricao;
+    hiddenInput.value = id;
+    
+    // Esconde o painel de resultados
+    resultsDiv.style.display = 'none';
+    
+    // Mostra o botão de limpar
+    if (clearButton) {
+        clearButton.classList.remove('hidden');
+    }
+}
+</script> 

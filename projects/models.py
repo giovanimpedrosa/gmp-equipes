@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from ckeditor.fields import RichTextField
+from tipo_projeto.models import TipoProjeto
 
 class Project(models.Model):
     title = models.CharField('Título', max_length=200)
@@ -15,6 +16,13 @@ class Project(models.Model):
         verbose_name='Proprietário',
         on_delete=models.CASCADE,
         related_name='projects'
+    )
+    tipo_projeto = models.ForeignKey(
+        TipoProjeto,
+        on_delete=models.PROTECT,
+        verbose_name="Tipo de Projeto",
+        null=True,
+        blank=True
     )
 
     class Meta:

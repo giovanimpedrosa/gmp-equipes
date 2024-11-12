@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'projects',
     'tasks',
     'ckeditor',
+    'tipo_projeto',
 ]
 
 # Configuração de autenticação

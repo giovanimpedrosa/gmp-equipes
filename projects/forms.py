@@ -1,6 +1,7 @@
 from django import forms
 from .models import Project
 from ckeditor.widgets import CKEditorWidget
+from tipo_projeto.models import TipoProjeto
 
 class ProjectForm(forms.ModelForm):
     detailed_description = forms.CharField(widget=CKEditorWidget(), required=False)
@@ -16,9 +17,18 @@ class ProjectForm(forms.ModelForm):
         localize=True
     )
     
+    tipo_projeto = forms.ModelChoiceField(
+        queryset=TipoProjeto.objects.all(),
+        widget=forms.Select(attrs={
+            'class': 'select2-autocomplete',
+            'data-placeholder': 'Selecione um tipo de projeto'
+        }),
+        required=False
+    )
+    
     class Meta:
         model = Project
-        fields = ['title', 'description', 'detailed_description', 'value', 'photo']
+        fields = ['title', 'description', 'detailed_description', 'value', 'photo', 'tipo_projeto']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
@@ -26,6 +36,5 @@ class ProjectForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
-            # Formata o valor para exibição
             self.initial['value'] = '{:.2f}'.format(self.instance.value)
 
