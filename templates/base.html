@@ -151,7 +151,7 @@
     {% csrf_token %} {% if not request.GET.popup %}
     <!-- Navbar -->
     <nav
-      class="fixed top-0 left-0 right-0 bg-indigo-600 dark:bg-indigo-800 z-50 shadow-md"
+      class="fixed top-0 left-0 right-0 bg-indigo-600 dark:bg-indico-800 z-50 shadow-lg"
     >
       <div class="flex">
         <!-- Área do brasão e título -->
@@ -177,7 +177,7 @@
                 <!-- Botão do menu alinhado com o conteúdo -->
                 <button
                   id="sidebar-toggle"
-                  class="p-2 text-white hover:text-gray-200 rounded-lg focus:outline-none"
+                  class="p-2 text-white hover:text-gray-200 hover:bg-indigo-500 hover:rounded-full focus:outline-none"
                 >
                   <svg
                     class="h-6 w-6"
@@ -211,7 +211,7 @@
                 <!-- Botão Dark Mode -->
                 <button
                   id="theme-toggle"
-                  class="p-2 text-white hover:text-gray-200 rounded-lg"
+                  class="p-2 text-white hover:text-gray-200 rounded-lg  hover:bg-indigo-500 hover:rounded-full"
                 >
                   <!-- Ícone Sol -->
                   <svg
@@ -249,7 +249,7 @@
                 <div class="relative">
                   <button
                     id="notifications-toggle"
-                    class="p-2 text-white hover:text-gray-200 rounded-lg relative"
+                    class="p-2 text-white hover:text-gray-200 rounded-lg relative  hover:bg-indigo-500 hover:rounded-full"
                   >
                     <svg
                       class="w-6 h-6"
@@ -494,7 +494,7 @@
     {% endif %}
 
     <!-- Conteúdo principal com margem para o sidebar -->
-    <main class="ml-64 pt-20 p-6">
+    <main class="ml-64 pt-20 p-6 transform transition-transform duration-300">
       {% if messages %} {% for message in messages %}
       <div
         class="mb-4 p-4 rounded-md {% if message.tags == 'success' %} bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 {% elif message.tags == 'error' %} bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 {% else %} bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 {% endif %}"
@@ -570,6 +570,9 @@
                 isSidebarOpen = !isSidebarOpen;
                 const isMobile = window.innerWidth < 768;
 
+                // Aplica a transição ao conteúdo principal
+                mainContent.style.transition = 'margin-left 300ms ease';                
+                
                 if (!isSidebarOpen) {
                     // Recolhe a sidebar
                     sidebar.style.transform = 'translateX(-100%)';
@@ -601,6 +604,9 @@
             // Ajusta a sidebar quando redimensionar a tela
             window.addEventListener('resize', function() {
                 const isMobile = window.innerWidth < 768;
+
+                // Aplica a transição ao conteúdo principal
+                mainContent.style.transition = 'margin-left 300ms ease';                
                 
                 if (isMobile) {
                     mainContent.classList.remove('ml-64', 'ml-0');

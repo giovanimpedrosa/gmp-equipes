@@ -4,11 +4,13 @@ from ckeditor.widgets import CKEditorWidget
 from tipo_projeto.models import TipoProjeto
 
 class ProjectForm(forms.ModelForm):
-    detailed_description = forms.CharField(widget=CKEditorWidget(), required=False)
+    title = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Digite um Título'}))
+    detailed_description = forms.CharField(widget=CKEditorWidget(), required=False, label='Descrição detalhada')
     value = forms.DecimalField(
         widget=forms.NumberInput(attrs={
-            'step': '0.01',
-            'min': '0',
+#            'step': '0.01',
+#            'min': '0',
+
             'class': 'mt-1 block w-full rounded-md p-2.5 border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:border-2 focus:border-indigo-500 dark:focus:border-indigo-500 focus:outline-none dark:text-white sm:text-sm'
         }),
         decimal_places=2,
