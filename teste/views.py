@@ -11,12 +11,13 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 def validate_input(request):
-    value = request.POST.get("number_field", "")
+    value1 = request.POST.get("number_field1", "")
+    value2 = request.POST.get("number_field2", "")
     try:
-        float(value)  # Tenta converter para um número decimal
+        float(value1)  # Tenta converter para um número decimal
         return JsonResponse({"status": "success", "message": ""})
     except ValueError:
-        return JsonResponse({"status": "error", "message": "Valor inválido. Use números e pontos/virgulas."})
+        return JsonResponse({"status": "error", "message": "Valor inválido. Use números e pontos/virgulas."}, json_dumps_params={'ensure_ascii': False})
 
 def process_data(request):
     # Lógica de processamento final

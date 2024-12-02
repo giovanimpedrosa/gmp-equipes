@@ -1,42 +1,14 @@
 <!-- templates/example.html -->
-{% load static %}
-<html lang="en">
-  <head>
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org"></script>
-    <script src="https://cdn.jsdelivr.net/npm/imask"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('[data-mask]').forEach((input) => {
-          const mask = input.dataset.mask
-          if (mask) {
-            //IMask(input, { mask })
-      
-            IMask(input, {
-              mask: Number, // enable number mask
-      
-              // other options are optional with defaults below
-              scale: 2, // digits after point, 0 for integers
-              thousandsSeparator: '.', // any single char
-              padFractionalZeros: false, // if true, then pads zeros at end to the length of scale
-              normalizeZeros: true, // appends or removes zeros at ends
-              radix: ',', // fractional delimiter
-              mapToRadix: ['.'], // symbols to process as radix
-      
-              // additional number interval options (e.g.)
-              min: 0,
-              max: 100000000,
-              autofix: true
-            })
-          }
-        })
-      })
-    </script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-  </head>
-  <body class="bg-gray-100 p-6">
-    <form>
-      {% include 'components/number_input_component.html' with input_id='number_field' name='number_field' label='Número' hx_post_url='/teste/validate/' mask='000,000,000.00' placeholder='0.00' value='' error_message='' %}
-      <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Enviar</button>
-    </form>
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}
+  Teste de Edicao
+{% endblock %}
+
+{% block content %}
+  <form>
+    {% include 'components/number_input_component.html' with input_id='number_field1' name='number_field1' label='Número' hx_post_url='/teste/validate/' mask='###,##0.00' placeholder='0.00' value='' error_message='' %}
+    {% include 'components/number_input_component.html' with input_id='number_field2' name='number_field2' label='Valor em Reais' hx_post_url='/teste/validate/' mask='###,###,##0.00' placeholder='0.00' value='' error_message='' %}
+    <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Enviar</button>
+  </form>
+{% endblock %}
