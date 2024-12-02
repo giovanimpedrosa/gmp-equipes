@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Input</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script src="https://cdn.jsdelivr.net/npm/imask"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-10">
+    <div class="max-w-lg mx-auto bg-white p-6 rounded shadow">
+        <form id="number-form" hx-post="/validate-number/" hx-swap="outerHTML">
+            {{ form.as_p }}
+            <div id="number-input-error" class="text-red-500 text-sm"></div>
+        </form>
+    </div>
+
+    <script>
+        // Aplica a máscara de entrada no campo com ID 'number-input'
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('number-input');
+            IMask(input, {
+                mask: '###,###,##0.00',
+                lazy: false,
+                blocks: {
+                    '#': { mask: /[0-9]/, optional: true },
+                    '0': { mask: /[0-9]/ }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
