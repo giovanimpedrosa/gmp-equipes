@@ -1,34 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Input</title>
-    <script src="https://unpkg.com/htmx.org"></script>
-    <script src="https://cdn.jsdelivr.net/npm/imask"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 p-10">
-    <div class="max-w-lg mx-auto bg-white p-6 rounded shadow">
-        <form id="number-form" hx-post="/validate-number/" hx-swap="outerHTML">
-            {{ form.as_p }}
-            <div id="number-input-error" class="text-red-500 text-sm"></div>
-        </form>
-    </div>
+<!-- templates/example.html -->
+{% extends 'base.html' %}
 
-    <script>
-        // Aplica a máscara de entrada no campo com ID 'number-input'
-        document.addEventListener('DOMContentLoaded', () => {
-            const input = document.getElementById('number-input');
-            IMask(input, {
-                mask: '###,###,##0.00',
-                lazy: false,
-                blocks: {
-                    '#': { mask: /[0-9]/, optional: true },
-                    '0': { mask: /[0-9]/ }
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+{% block title %}
+  Teste de Edicao com Form
+{% endblock %}
+
+{% block content %}
+  <div class="{% if not request.GET.popup %}max-w-3xl mx-auto{% endif %}">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Projeto</h2> <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
+      <form id="input-form" method="post" class="p-6 flex flex-col h-full gap-2">
+        {% csrf_token %}
+
+        <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.text.label }}</label>
+        {{ form.text }}
+        <div id="text-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.email.label }}</label>
+        {{ form.email }}
+        <div id="email-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.password.label }}</label>
+        {{ form.password }}
+        <div id="password-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.date.label }}</label>
+        {{ form.date }}
+        <div id="date-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.number.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.number.label }}</label>
+        {{ form.number }}
+        <div id="number-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.textarea.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.textarea.label }}</label>
+        {{ form.textarea }}
+        <div id="textarea-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.is_active.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.is_active.label }}</label>
+        {{ form.is_active }}
+        <div id="checkbox-input-error" class="text-red-500 text-sm"></div>
+
+        <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ form.category.label }}</label>
+        {{ form.category }}
+        <div id="select-input-error" class="text-red-500 text-sm"></div>
+
+        <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enviar</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

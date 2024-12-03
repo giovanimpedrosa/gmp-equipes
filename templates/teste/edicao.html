@@ -6,9 +6,13 @@
 {% endblock %}
 
 {% block content %}
-  <form>
-    {% include 'components/number_input_component.html' with input_id='number_field1' name='number_field1' label='Número' hx_post_url='/teste/validate/' mask='###,##0.00' placeholder='0.00' value='' error_message='' %}
-    {% include 'components/number_input_component.html' with input_id='number_field2' name='number_field2' label='Valor em Reais' hx_post_url='/teste/validate/' mask='###,###,##0.00' placeholder='0.00' value='' error_message='' %}
-    <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Enviar</button>
-  </form>
+  <div class="{% if not request.GET.popup %}max-w-3xl mx-auto{% endif %}">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ action }} Projeto</h2> <div class="bg-white dark:bg-gray-800 shadow rounded-lg flex flex-col">
+      <form class="p-6 flex flex-col h-full">
+        {% include 'components/number_input_component.html' with input_id='number_field1' name='number_field1' label='Número' hx_post_url='/teste/validate/' mask='###,##0.00' placeholder='0.00' value='' error_message='' %}
+        {% include 'components/number_input_component.html' with input_id='number_field2' name='number_field2' label='Valor em Reais' hx_post_url='/teste/validate/' mask='###,###,##0.00' placeholder='0.00' value='' error_message='' %}
+        <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Enviar</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}
